@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>HydroLearning - המדריך הפדגוגי המלא</title>
+    <title>HydroLearning - המדריך המקצועי</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -15,23 +15,43 @@
     <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700;800&family=Frank+Ruhl+Libre:wght@500;700&display=swap" rel="stylesheet">
 
     <style>
+        /* Base Settings */
         body {
             font-family: 'Assistant', sans-serif;
             background-color: #f8fafc;
             color: #1e293b;
             -webkit-tap-highlight-color: transparent;
-            overflow-x: hidden;
         }
 
-        /* Typography Enhancements */
+        /* MOBILE SCROLL FIX:
+           On mobile, we allow the body to scroll naturally to enable 'Pull to Refresh'.
+           On desktop, we fix the body to allow split-screen scrolling (sidebar + content).
+        */
+        @media (min-width: 768px) {
+            body {
+                height: 100vh;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+            }
+            #main-container {
+                flex: 1;
+                overflow: hidden;
+                display: flex;
+            }
+            #main-scroll {
+                flex: 1;
+                overflow-y: auto;
+            }
+        }
+
+        /* Typography & Components */
         h1, h2, h3, h4 { font-family: 'Assistant', sans-serif; letter-spacing: -0.02em; }
-        .serif-quote { font-family: 'Frank Ruhl Libre', serif; font-style: italic; }
         
-        /* Educational Content Blocks */
         .concept-card {
             background-color: #ffffff;
             border: 1px solid #e2e8f0;
-            border-right: 4px solid #3b82f6; /* Accent color */
+            border-right: 4px solid #3b82f6;
             border-radius: 1rem;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
@@ -40,7 +60,7 @@
         
         .definition-box {
             background-color: #f0f9ff;
-            border-left: 4px solid #0ea5e9; /* LTR visual, actually right in RTL context if directed properly, let's fix in classes */
+            border-left: 4px solid #0ea5e9;
             padding: 1rem;
             border-radius: 0.5rem;
             margin: 1rem 0;
@@ -48,24 +68,21 @@
             color: #0c4a6e;
         }
 
-        /* Smooth Scrolling */
-        html { scroll-behavior: smooth; }
-
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
 
-        /* Navigation */
+        /* Navigation State */
         .nav-item { border-right: 4px solid transparent; transition: all 0.2s; }
         .nav-item:hover { background-color: #f0f9ff; color: #0284c7; }
         .nav-item.active { background-color: #e0f2fe; color: #0369a1; font-weight: 700; border-right-color: #0ea5e9; }
 
-        /* Fade Animation */
+        /* Animation */
         .fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Slider */
+        /* Slider Styling */
         input[type=range] { -webkit-appearance: none; background: transparent; }
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none; height: 28px; width: 28px; border-radius: 50%;
@@ -86,15 +103,15 @@
         .btn-mobile-nav:active { transform: scale(0.97); }
     </style>
 </head>
-<body class="flex flex-col h-screen overflow-hidden text-slate-700">
+<body class="text-slate-700">
 
-    <!-- Header -->
-    <header class="bg-white shadow-sm z-30 h-16 flex items-center justify-between px-4 md:px-6 border-b border-gray-100 flex-shrink-0">
+    <!-- Header (Sticky on Mobile, Fixed in Flex on Desktop) -->
+    <header class="bg-white shadow-sm z-30 h-16 flex items-center justify-between px-4 md:px-6 border-b border-gray-100 sticky top-0 md:relative">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 bg-gradient-to-br from-sky-500 to-blue-600 rounded-xl flex items-center justify-center text-white text-xl shadow-lg shadow-sky-100">🌊</div>
             <div>
                 <h1 class="text-xl md:text-2xl font-black text-slate-800 tracking-tight leading-none">HydroLearning</h1>
-                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest hidden md:block">המדריך המקצועי המלא</p>
+                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest hidden md:block">המדריך המקצועי</p>
             </div>
         </div>
         <div class="flex items-center gap-3">
@@ -108,9 +125,10 @@
         </div>
     </header>
 
-    <div class="flex flex-1 overflow-hidden">
+    <!-- Main Container Layout -->
+    <div id="main-container">
         
-        <!-- Sidebar (Desktop) -->
+        <!-- Sidebar (Desktop Only) -->
         <aside class="w-80 bg-white border-l border-gray-200 hidden md:flex flex-col z-20 overflow-y-auto">
             <nav class="p-6 space-y-8">
                 <div>
@@ -119,7 +137,7 @@
                     <button onclick="navTo('intake')" id="nav-intake" class="nav-item w-full text-right px-4 py-3 rounded-lg flex items-center gap-3 mb-1">📋 תהליך קבלה (Intake)</button>
                 </div>
                 <div>
-                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-3">מדעים (תיאוריה)</p>
+                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-3">מדעים</p>
                     <button onclick="navTo('physics')" id="nav-physics" class="nav-item w-full text-right px-4 py-3 rounded-lg flex items-center gap-3 mb-1">⚖️ הידרו-מכניקה (פיזיקה)</button>
                     <button onclick="navTo('physiology')" id="nav-physiology" class="nav-item w-full text-right px-4 py-3 rounded-lg flex items-center gap-3 mb-1">🫀 פיזיולוגיה והעור</button>
                 </div>
@@ -131,13 +149,13 @@
             </nav>
         </aside>
 
-        <!-- Main Content -->
-        <main id="main-scroll" class="flex-1 overflow-y-auto bg-slate-50 relative overscroll-contain">
-            <div class="max-w-4xl mx-auto p-5 md:p-12 pb-40">
+        <!-- Main Content Area -->
+        <main id="main-scroll" class="bg-slate-50 relative">
+            <div class="max-w-4xl mx-auto p-5 md:p-12 pb-24">
                 
-                <!-- Mobile Nav -->
-                <div class="md:hidden mb-8 sticky top-0 z-10 bg-slate-50/95 backdrop-blur py-2">
-                    <select onchange="navTo(this.value)" id="mobile-select" class="w-full p-3.5 rounded-xl border border-gray-300 shadow-sm bg-white font-bold text-slate-700 text-lg">
+                <!-- Mobile Dropdown Nav -->
+                <div class="md:hidden mb-8">
+                    <select onchange="navTo(this.value)" id="mobile-select" class="w-full p-3.5 rounded-xl border border-gray-300 shadow-sm bg-white font-bold text-slate-700 text-lg focus:ring-2 focus:ring-sky-500 outline-none">
                         <option value="intro">🏛️ מבוא והיסטוריה</option>
                         <option value="intake">📋 תהליך קבלה (Intake)</option>
                         <option value="physics">⚖️ הידרו-מכניקה (פיזיקה)</option>
@@ -151,41 +169,40 @@
                 <section id="sec-intro" class="fade-in">
                     <div class="mb-10 pb-4 border-b border-gray-200">
                         <h2 class="text-3xl md:text-4xl font-black text-slate-800 mb-3">מבוא להידרותרפיה</h2>
-                        <p class="text-xl text-slate-500 font-light">השימוש במים לריפוי: עבר, הווה ועתיד.</p>
+                        <p class="text-xl text-slate-500 font-light">סקירה היסטורית ועקרונות יסוד בטיפול במים.</p>
                     </div>
 
                     <div class="prose prose-slate max-w-none text-slate-700 leading-relaxed">
                         <p class="mb-6">
-                            הידרותרפיה (Hydrotherapy) מוגדרת כשימוש במים - בכל מצבי הצבירה ובטמפרטורות שונות - לשימור הבריאות ולטיפול במחלות. 
-                            למים תכונות פיזיקליות ייחודיות המאפשרות ליצור סביבה שיקומית שאינה קיימת ביבשה.
+                            הידרותרפיה (Hydrotherapy) היא דיסציפלינה טיפולית המנצלת את התכונות הפיזיקליות של המים - חום, לחץ הידרוסטטי וכוח עילוי - לשיקום פיזיקלי, הפחתת כאב ושיפור איכות החיים.
                         </p>
                         
                         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mb-8">
                             <h3 class="font-bold text-xl text-slate-800 mb-4 flex items-center gap-2">📜 רקע היסטורי</h3>
                             <p class="text-sm">
-                                השימוש במים למרפא אינו חדש. הוא מתועד עוד מהתרבויות המינואיות והמצרים הקדמונים שהשתמשו במים להיגיינה ופולחן.
+                                השימוש במים לצרכים רפואיים מתועד לאורך אלפי שנים, החל מהתרבויות המינואיות והמצרים הקדמונים.
                                 <br>
-                                <strong>היפוקרטס (Hippocrates, 460-377 לפנה"ס)</strong>, הנחשב לאבי הרפואה, היה הראשון שחקר באופן מדעי את השפעת המים (קרים וחמים) על גוף האדם וטיפל במחלות שונות באמצעות רחצה ושתייה.
-                            </לp>
+                                <strong>היפוקרטס (Hippocrates)</strong>, אבי הרפואה המודרנית, ביסס את ההבנה המדעית הראשונית של השפעות המים על הפיזיולוגיה האנושית, והבחין בין השפעות של מים קרים (סטימולציה) למים חמים (סדציה).
+                            </p>
                         </div>
 
-                        <h3 class="font-bold text-2xl text-slate-800 mb-6">יתרונות הטיפול (מתוך מסמך טיפולי מים)</h3>
+                        <h3 class="font-bold text-2xl text-slate-800 mb-6">מטרות ויתרונות הטיפול</h3>
                         <div class="grid md:grid-cols-2 gap-4 mb-8">
                             <div class="concept-card">
-                                <h4 class="font-bold text-sky-700 mb-2">יתרונות פיזיים</h4>
+                                <h4 class="font-bold text-sky-700 mb-2">יתרונות פיזיולוגיים</h4>
                                 <ul class="list-disc list-inside space-y-2 text-sm">
-                                    <li><strong>הרפיית שרירים:</strong> החום והלחץ משחררים כיווץ (Spasm).</li>
-                                    <li><strong>שיפור זרימת דם:</strong> אספקת חמצן לרקמות פגועות.</li>
-                                    <li><strong>גמישות:</strong> הגדלת טווחי תנועה (ROM) ללא כאב.</li>
-                                    <li><strong>שיפור שינה:</strong> הרגעה כללית המסייעת להירדמות.</li>
+                                    <li><strong>הרפיית שרירים:</strong> השילוב של חום ולחץ מסייע בשחרור מתח שרירי (Hypertonia).</li>
+                                    <li><strong>שיפור המודינמי:</strong> הרחבת כלי דם ושיפור זרימת דם פריפרית.</li>
+                                    <li><strong>שיפור טווחי תנועה (ROM):</strong> הפחתת עומס הכבידה מאפשרת תנועה חופשית יותר.</li>
+                                    <li><strong>שיפור איכות השינה:</strong> השפעה מרגיעה על מערכת העצבים האוטונומית.</li>
                                 </ul>
                             </div>
                             <div class="concept-card !border-r-green-500">
-                                <h4 class="font-bold text-green-700 mb-2">יתרונות נפשיים</h4>
+                                <h4 class="font-bold text-green-700 mb-2">יתרונות פסיכו-סוציאליים</h4>
                                 <ul class="list-disc list-inside space-y-2 text-sm">
-                                    <li><strong>הפחתת מתח (Stress):</strong> המים כסביבה עוטפת ומגינה.</li>
-                                    <li><strong>ביטחון עצמי:</strong> יכולת תנועה במים שאינה אפשרית ביבשה.</li>
-                                    <li><strong>אינטראקציה חברתית:</strong> במסגרת טיפול קבוצתי.</li>
+                                    <li><strong>ויסות מתח (Stress Management):</strong> הפחתת רמות קורטיזול ורגיעה נפשית.</li>
+                                    <li><strong>מסוגלות עצמית:</strong> יכולת תפקוד גבוהה יותר במים לעומת היבשה.</li>
+                                    <li><strong>אינטראקציה:</strong> המים כתווך המאפשר תקשורת ומגע בטוח.</li>
                                 </ul>
                             </div>
                         </div>
@@ -195,17 +212,16 @@
                 <!-- 2. INTAKE -->
                 <section id="sec-intake" class="hidden fade-in">
                     <div class="mb-10 pb-4 border-b border-gray-200">
-                        <h2 class="text-3xl font-black text-slate-800 mb-3">תהליך הקבלה (The Clinical Process)</h2>
-                        <p class="text-xl text-slate-500">בטיחות קודמת לכל: המסלול מהפנייה ועד הכניסה למים.</p>
+                        <h2 class="text-3xl font-black text-slate-800 mb-3">תהליך הקבלה (Intake Protocol)</h2>
+                        <p class="text-xl text-slate-500">ניהול סיכונים ובדיקת התאמה לטיפול.</p>
                     </div>
 
                     <p class="mb-6 leading-relaxed">
-                        לפני תחילת הטיפול, חובה לבצע תהליך סינון קפדני. המים מייצרים עומס פיזיולוגי (על הלב והנשימה) שעלול להיות מסוכן למטופלים מסוימים.
-                        על פי מסמך הקונטרה-אינדיקציות, התהליך מורכב משלושה שלבים:
+                        בשל השינויים הפיזיולוגיים המתרחשים בעת טבילה (שינויים בלחץ הדם, בנפח הפעימה ובמערכת הנשימה), נדרש הליך סינון מובנה להבטחת בטיחות המטופל.
                     </p>
 
                     <div class="space-y-8 relative pl-4 md:pl-0">
-                        <!-- Connecting Line -->
+                        <!-- Line -->
                         <div class="absolute right-[19px] top-0 bottom-0 w-0.5 bg-slate-200 hidden md:block"></div>
 
                         <!-- Step 1 -->
@@ -214,8 +230,8 @@
                             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                                 <h3 class="font-bold text-lg text-slate-800 mb-2">אישור רפואי (Medical Clearance)</h3>
                                 <p class="text-sm text-slate-600">
-                                    הבסיס לכל טיפול. חובה לקבל אישור בכתב מרופא משפחה המאשר "פעילות גופנית במים" או "הידרותרפיה".
-                                    <br><span class="text-red-500 font-bold">חשוב:</span> עבור קטינים נדרשת חתימת הורים והצהרת בריאות עדכנית.
+                                    דרישת סף לתחילת טיפול. יש להציג אישור רופא עדכני המאשר השתתפות בפעילות הידרותרפית.
+                                    <br><span class="text-red-500 font-bold">דגש:</span> בטיפול בקטינים נדרשת בנוסף חתימת הורים והצהרת בריאות מפורטת.
                                 </p>
                             </div>
                         </div>
@@ -224,19 +240,19 @@
                         <div class="relative md:pr-12">
                             <div class="hidden md:flex absolute right-0 top-0 w-10 h-10 bg-sky-600 rounded-full items-center justify-center text-white font-bold z-10">2</div>
                             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                                <h3 class="font-bold text-lg text-slate-800 mb-2">אינטייק (Intake Assessment)</h3>
+                                <h3 class="font-bold text-lg text-slate-800 mb-2">תשאול ואבחון (Assessment)</h3>
                                 <p class="text-sm text-slate-600 mb-4">
-                                    תשאול מקיף שמטרתו להכיר את המטופל ולזהות גורמי סיכון. האינטייק יכול להתבצע ביבשה (ללא הסחות דעת) או במים (לבדיקת יכולות פיזיות).
+                                    איסוף אנמנזה רפואית לזיהוי גורמי סיכון. האבחון עשוי לכלול חלק יבשתי וחלק מימי (לבדיקת תפקוד במים).
                                 </p>
                                 <div class="bg-sky-50 p-4 rounded-xl text-sm">
-                                    <strong>שאלות חובה באינטייק:</strong>
+                                    <strong>נושאי ליבה בתשאול:</strong>
                                     <ul class="list-disc list-inside mt-2 grid grid-cols-2 gap-2">
-                                        <li>האם יש מחלות לב?</li>
-                                        <li>האם נוטל תרופות קבועות?</li>
-                                        <li>האם סובל מאפילפסיה?</li>
-                                        <li>האם יש שליטה על סוגרים?</li>
-                                        <li>האם יש פחד ממים?</li>
-                                        <li>האם יודע לשחות?</li>
+                                        <li>מחלות קרדיו-ווסקולריות</li>
+                                        <li>טיפול תרופתי קבוע</li>
+                                        <li>היסטוריה של אפילפסיה</li>
+                                        <li>שליטה בסוגרים</li>
+                                        <li>הידרופוביה (חרדת מים)</li>
+                                        <li>יכולות שחייה בסיסיות</li>
                                     </ul>
                                 </div>
                             </div>
@@ -246,10 +262,9 @@
                         <div class="relative md:pr-12">
                             <div class="hidden md:flex absolute right-0 top-0 w-10 h-10 bg-sky-600 rounded-full items-center justify-center text-white font-bold z-10">3</div>
                             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                                <h3 class="font-bold text-lg text-slate-800 mb-2">קבלת החלטות והצבת מטרות</h3>
+                                <h3 class="font-bold text-lg text-slate-800 mb-2">קבלת החלטות קלינית</h3>
                                 <p class="text-sm text-slate-600">
-                                    בשלב זה המטפל מצליב את המידע הרפואי עם רשימת הקונטרה-אינדיקציות (ראה פרק בטיחות).
-                                    אם המטופל כשיר, נקבעות מטרות טיפוליות (למשל: הפחתת כאב גב תחתון, שיפור הליכה לאחר אירוע מוחי).
+                                    בשלב זה מתבצעת הצלבה מול רשימת הקונטרה-אינדיקציות (התוויות נגד) לקביעת כשירות לטיפול והגדרת מטרות טיפוליות (כגון שיפור הליכה, הפחתת כאב, חיזוק חגורת כתפיים).
                                 </p>
                             </div>
                         </div>
@@ -259,48 +274,44 @@
                 <!-- 3. PHYSICS -->
                 <section id="sec-physics" class="hidden fade-in">
                     <div class="mb-10 pb-4 border-b border-gray-200">
-                        <h2 class="text-3xl font-black text-slate-800 mb-3">הידרו-מכניקה (תכונות המים)</h2>
-                        <p class="text-xl text-slate-500">הפיזיקה שמאחורי הקסם הטיפולי.</p>
+                        <h2 class="text-3xl font-black text-slate-800 mb-3">הידרו-מכניקה</h2>
+                        <p class="text-xl text-slate-500">עקרונות פיזיקליים בבסיס הטיפול.</p>
                     </div>
 
-                    <!-- 1. Density & Buoyancy -->
+                    <!-- 1. Buoyancy -->
                     <div class="mb-12">
-                        <h3 class="text-2xl font-bold text-slate-800 mb-4">1. צפיפות, משקל סגולי וכוח עילוי</h3>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4">1. כוח העילוי (Buoyancy)</h3>
                         <div class="definition-box">
-                            <strong>חוק ארכימדס:</strong> "על גוף הטבול בנוזל פועל כוח עילוי (Buoyancy) כלפי מעלה, השווה למשקל הנוזל שהגוף דחק."
+                            <strong>חוק ארכימדס:</strong> "על גוף הטבול בנוזל פועל כוח עילוי אנכי כלפי מעלה, השווה למשקל הנוזל שאותו הגוף דחק."
                         </div>
                         <p class="mb-4 text-slate-700">
-                            כוח העילוי פועל בניגוד לכוח הכבידה. התוצאה היא <strong>"משקל מדומה" (Apparent Weight)</strong>.
-                            ככל שגוף האדם שקוע עמוק יותר, כך הוא "שוקל" פחות. תכונה זו מאפשרת למטופלים שאינם יכולים לשאת משקל ביבשה (שברים, כאבי ברכיים) לעמוד וללכת במים.
-                        </p>
-                        <p class="mb-6 text-sm text-slate-500">
-                            * צפיפות האדם הממוצעת (0.974) נמוכה במעט מזו של מים (1.0), ולכן רוב בני האדם צפים.
-                            נשימה עמוקה (מילוי ריאות באוויר) מורידה את הצפיפות ומשפרת ציפה.
+                            כוח העילוי מנטרל חלקית את כוח הכבידה, ומייצר מצב של <strong>"משקל מדומה" (Apparent Weight)</strong>.
+                            תכונה זו קריטית בשיקום אורתופדי, כיוון שהיא מאפשרת נשיאת משקל מופחתת על מפרקים פגועים.
                         </p>
 
                         <!-- Calculator -->
                         <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-100 flex flex-col items-center">
-                            <h4 class="font-bold text-sky-700 mb-4">מחשבון עומס מפרקי במים</h4>
+                            <h4 class="font-bold text-sky-700 mb-4">חישוב עומס מפרקי במים</h4>
                             <div class="flex flex-col md:flex-row items-center gap-4 w-full justify-center">
                                 <div class="w-full md:w-auto">
-                                    <label class="block text-xs font-bold text-slate-400 mb-1">משקל ביבשה (ק"ג)</label>
+                                    <label class="block text-xs font-bold text-slate-400 mb-1">משקל גוף (ק"ג)</label>
                                     <input type="number" id="phy-weight" value="80" class="w-full p-3 bg-slate-50 rounded-lg font-bold text-center border border-slate-200" oninput="calcPhy()">
                                 </div>
                                 <div class="text-sky-300 text-2xl hidden md:block">←</div>
                                 <div class="text-sky-300 text-2xl md:hidden">↓</div>
                                 <div class="w-full md:w-auto">
-                                    <label class="block text-xs font-bold text-slate-400 mb-1">עומק המים</label>
+                                    <label class="block text-xs font-bold text-slate-400 mb-1">עומק הטבילה</label>
                                     <select id="phy-depth" class="w-full p-3 bg-slate-50 rounded-lg text-sm border border-slate-200" onchange="calcPhy()">
-                                        <option value="0.1">עד הצוואר (נושאים רק 10%)</option>
-                                        <option value="0.3">עד החזה (נושאים 30%)</option>
-                                        <option value="0.5">עד המותן (נושאים 50%)</option>
+                                        <option value="0.1">קו צוואר (עומס 10%)</option>
+                                        <option value="0.3">קו חזה (עומס 30%)</option>
+                                        <option value="0.5">קו מותן (עומס 50%)</option>
                                     </select>
                                 </div>
                                 <div class="text-sky-300 text-2xl hidden md:block">←</div>
                                 <div class="text-sky-300 text-2xl md:hidden">↓</div>
                                 <div class="bg-sky-50 p-4 rounded-xl text-center w-full md:w-40 border border-sky-100">
                                     <div id="phy-result" class="text-3xl font-black text-sky-600">8.0</div>
-                                    <div class="text-xs font-bold text-sky-400">ק"ג משקל מדומה</div>
+                                    <div class="text-xs font-bold text-sky-400">ק"ג (משקל מדומה)</div>
                                 </div>
                             </div>
                         </div>
@@ -308,36 +319,35 @@
 
                     <!-- 2. Hydrostatic Pressure -->
                     <div class="mb-12">
-                        <h3 class="text-2xl font-bold text-slate-800 mb-4">2. לחץ הידרוסטטי (חוק פסקל)</h3>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4">2. לחץ הידרוסטטי</h3>
                         <div class="definition-box">
-                            <strong>חוק פסקל:</strong> "לחץ הנוזל פועל באופן שווה בכל הכיוונים ועוצמתו עולה ביחס ישיר לעומק."
+                            <strong>חוק פסקל:</strong> "לחץ המופעל על נוזל במנוחה מועבר באופן שווה לכל הכיוונים. הלחץ עולה ביחס ישיר לעומק."
                         </div>
                         <div class="grid md:grid-cols-2 gap-4">
                             <div class="concept-card">
-                                <h4 class="font-bold text-slate-800 mb-2">השפעה על הנשימה</h4>
+                                <h4 class="font-bold text-slate-800 mb-2">מערכת הנשימה</h4>
                                 <p class="text-sm">
-                                    הלחץ על בית החזה מקשה על התרחבות הריאות בזמן שאיפה (Inspiration) ובכך מחזק את שרירי הנשימה (כמו אימון משקולות לריאות). הנשיפה (Expiration) נעשית קלה יותר.
+                                    הלחץ המופעל על בית החזה יוצר התנגדות להתרחבות הריאות בעת שאיפה (Inspiration), מה שמוביל לחיזוק שרירי העזר הנשימתיים ושיפור הקיבולת החיונית לאורך זמן.
                                 </p>
                             </div>
                             <div class="concept-card">
-                                <h4 class="font-bold text-slate-800 mb-2">השפעה על מחזור הדם</h4>
+                                <h4 class="font-bold text-slate-800 mb-2">מערכת הלימפה והורידים</h4>
                                 <p class="text-sm">
-                                    הלחץ פועל כ"גרב לחץ" על הגפיים התחתונות, דוחף נוזלים ודם ורידי כלפי מעלה ללב. זהו מנגנון מצוין להפחתת בצקות (Edema).
+                                    הלחץ פועל כאמצעי דחיסה חיצוני (External Compression) על הגפיים, מסייע בחזר הורידי (Venous Return) ומפחית בצקות ונפיחויות פריפריות.
                                 </p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 3. Viscosity -->
+                    <!-- 3. Drag -->
                     <div class="mb-12">
-                        <h3 class="text-2xl font-bold text-slate-800 mb-4">3. צמיגות, גרר והתנגדות</h3>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4">3. צמיגות וגרר (Hydrodynamics)</h3>
                         <p class="mb-4">
-                            המים צמיגיים פי כמה מהאוויר. צמיגות זו יוצרת חיכוך והתנגדות לתנועה הנקראת <strong>גרר (Drag Force)</strong>.
-                            <br>הכלל הקריטי למטפלים: <strong>ההתנגדות עולה בריבוע המהירות ($V^2$).</strong>
+                            המים מאופיינים בצמיגות גבוהה היוצרת התנגדות לתנועה, המכונה <strong>כוח גרר (Drag Force)</strong>.
+                            <br>העיקרון המנחה בבניית אימון: <strong>ההתנגדות עולה בריבוע המהירות ($V^2$).</strong>
                         </p>
                         <div class="bg-orange-50 p-4 rounded-xl border border-orange-100 text-sm text-orange-900">
-                            💡 <strong>יישום קליני:</strong> אם נבקש ממטופל לבצע תנועה מהר פי 2, ההתנגדות תהיה קשה פי 4! זו דרך מצוינת לווסת עומס באימון.
-                            כמו כן, הגדלת שטח הפנים (יד פתוחה מול אגרוף) מגבירה את המערבולות ואת ההתנגדות.
+                            💡 <strong>יישום קליני:</strong> הכפלת מהירות התנועה תוביל להגדלת ההתנגדות פי 4. עיקרון זה מאפשר התאמת עומס מדויקת (פרוגרסיביות) על ידי שינוי מהירות הביצוע או הגדלת שטח הפנים (למשל, שימוש בכפות ידיים פתוחות).
                         </div>
                     </div>
                 </section>
@@ -346,105 +356,99 @@
                 <section id="sec-physiology" class="hidden fade-in">
                     <div class="mb-10 pb-4 border-b border-gray-200">
                         <h2 class="text-3xl font-black text-slate-800 mb-3">פיזיולוגיה והעור</h2>
-                        <p class="text-xl text-slate-500">הממשק בין הגוף למים והתגובות הפנימיות.</p>
+                        <p class="text-xl text-slate-500">תגובות מערכתיות לטבילה במים.</p>
                     </div>
 
-                    <!-- The Skin (Restored Content) -->
+                    <!-- Skin -->
                     <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 mb-12">
                         <h3 class="text-2xl font-bold text-pink-700 mb-4 flex items-center gap-2">
-                            <span>🧖</span> העור (Integumentary System)
+                            <span>🧖</span> מערכת העור (Integumentary System)
                         </h3>
                         <p class="mb-4">
-                            העור הוא האיבר הגדול ביותר בגוף והוא המתווך הישיר בטיפול ההידרותרפי. הוא מורכב משלוש שכבות עיקריות, כאשר שתיים מהן רלוונטיות במיוחד לטיפול:
+                            העור מהווה את הממשק הראשוני בין הגוף לסביבה המימית. הוא מורכב משכבות שונות, כאשר הדרמיס (Dermis) מכיל את כלי הדם והקולטנים העצביים הרלוונטיים לטיפול.
                         </p>
-                        <ul class="list-disc list-inside space-y-3 mb-6 text-sm text-slate-700">
-                            <li><strong>אפידרמיס (Epidermis):</strong> השכבה החיצונית המגנה. אין בה כלי דם, אך היא מעבירה את הגירוי התרמי פנימה.</li>
-                            <li><strong>דרמיס (Dermis):</strong> השכבה הפעילה המכילה כלי דם, בלוטות זיעה וקולטנים עצביים.</li>
-                        </ul>
                         
-                        <h4 class="font-bold text-slate-800 mb-2">תפקידי העור במים:</h4>
+                        <h4 class="font-bold text-slate-800 mb-2">מנגנונים עיקריים:</h4>
                         <div class="grid md:grid-cols-2 gap-4">
                             <div class="bg-pink-50 p-4 rounded-xl">
-                                <strong>ויסות חום (Thermoregulation):</strong> במים חמים, כלי הדם בדרמיס מתרחבים (Vasodilation) כדי לפלוט חום – העור נהיה אדום. במים, הזיעה לא מתנדפת ולכן הגוף מתקשה להתקרר (סכנת מכת חום).
+                                <strong>ויסות תרמי:</strong> במים חמים, מתרחשת הרחבת כלי דם עוריים (Vasodilation) במטרה לפלוט חום. היות והזעה אינה מתנדפת במים, מנגנון הקירור הטבעי מוגבל.
                             </div>
                             <div class="bg-pink-50 p-4 rounded-xl">
-                                <strong>חישה (Sensation):</strong> העור עמוס בקולטנים (Receptors) למגע, לחץ וחום. המים מספקים "הצפה חושית" נעימה המרגיעה את מערכת העצבים.
+                                <strong>קלט סנסורי:</strong> המים מספקים גירוי תחושתי רב-מוקדי (טמפרטורה, לחץ ומגע). גירוי זה מוביל ל"הצפה סנסורית" הממתנת את פעילות מערכת העצבים הסימפטתית.
                             </div>
                         </div>
                     </div>
 
-                    <!-- The Pain Cycle -->
+                    <!-- Pain Cycle -->
                     <div class="mb-12">
                         <h3 class="text-2xl font-bold text-slate-800 mb-6">מעגל הכאב (The Pain Cycle)</h3>
                         <p class="mb-6">
-                            אחת המטרות הראשיות בטיפול היא שבירת "מעגל הכאב". זהו תהליך הרסני המתרחש בפציעות כרוניות. המים מאפשרים לפרוץ אותו במספר נקודות.
+                            כאב כרוני יוצר מעגל קסמים פיזיולוגי המנציח את עצמו. הטיפול ההידרותרפי מאפשר התערבות במספר שלבים קריטיים במעגל זה.
                         </p>
                         
-                        <!-- Visualization -->
                         <div class="relative bg-slate-800 text-white p-8 rounded-3xl overflow-hidden">
-                            <!-- Background Decoration -->
                             <div class="absolute top-0 right-0 w-64 h-64 bg-sky-500 rounded-full mix-blend-overlay filter blur-3xl opacity-20"></div>
 
                             <div class="grid md:grid-cols-4 gap-4 text-center relative z-10">
                                 <div class="bg-slate-700 p-4 rounded-xl border border-slate-600">
                                     <div class="text-3xl mb-2">⚡</div>
                                     <div class="font-bold text-red-400">כאב</div>
-                                    <div class="text-xs text-slate-400">המקור לבעיה</div>
+                                    <div class="text-xs text-slate-400">הטריגר הראשוני</div>
                                 </div>
                                 <div class="hidden md:flex items-center justify-center text-2xl text-slate-500">➜</div>
                                 <div class="bg-slate-700 p-4 rounded-xl border border-slate-600">
                                     <div class="text-3xl mb-2">🔒</div>
-                                    <div class="font-bold text-yellow-400">כיווץ שרירי</div>
-                                    <div class="text-xs text-slate-400">מנגנון הגנה (Spasm)</div>
+                                    <div class="font-bold text-yellow-400">כיווץ הגנתי</div>
+                                    <div class="text-xs text-slate-400">Muscle Spasm</div>
                                 </div>
                                 <div class="hidden md:flex items-center justify-center text-2xl text-slate-500">➜</div>
                                 <div class="bg-slate-700 p-4 rounded-xl border border-slate-600">
                                     <div class="text-3xl mb-2">🩸</div>
                                     <div class="font-bold text-orange-400">איסכמיה</div>
-                                    <div class="text-xs text-slate-400">חוסר זרימת דם</div>
+                                    <div class="text-xs text-slate-400">ירידה באספקת דם</div>
                                 </div>
                                 <div class="hidden md:flex items-center justify-center text-2xl text-slate-500">➜</div>
                                 <div class="bg-slate-700 p-4 rounded-xl border border-slate-600">
                                     <div class="text-3xl mb-2">☣️</div>
-                                    <div class="font-bold text-purple-400">רעלים</div>
-                                    <div class="text-xs text-slate-400">מטבוליטים של כאב</div>
+                                    <div class="font-bold text-purple-400">תוצרי דלקת</div>
+                                    <div class="text-xs text-slate-400">הצטברות פסולת</div>
                                 </div>
                             </div>
                             
                             <div class="mt-8 bg-sky-900/50 p-4 rounded-xl border border-sky-500/30 text-sm text-sky-100">
-                                <strong>הפתרון ההידרותרפי:</strong> המים החמים מרחיבים כלי דם (פותרים איסכמיה) ושוטפים את הרעלים. במקביל, הגירוי העצבי החזק של המים (חום+מגע) חוסם את מעבר אותות הכאב למוח לפי תיאוריית שער הכאב (Gate Control).
+                                <strong>ההתערבות הטיפולית:</strong> החום והלחץ משפרים את זרימת הדם (פתרון איסכמיה), מפנים תוצרי לוואי דלקתיים, ומרפים את השריר המכווץ. במקביל, הגירוי הסנסורי חוסם את הולכת הכאב ברמת חוט השדרה (Gate Control Theory).
                             </div>
                         </div>
                     </div>
                 </section>
 
-                <!-- 5. METHODS & TEMPS -->
+                <!-- 5. METHODS -->
                 <section id="sec-methods" class="hidden fade-in">
                     <div class="mb-10 pb-4 border-b border-gray-200">
                         <h2 class="text-3xl font-black text-slate-800 mb-3">ארגז הכלים: טמפרטורה ושיטות</h2>
-                        <p class="text-xl text-slate-500">כיצד בוחרים את הכלי הנכון למטרה הטיפולית?</p>
+                        <p class="text-xl text-slate-500">אסטרטגיות טיפול והתאמת הסביבה.</p>
                     </div>
 
-                    <!-- Intro to Temps -->
+                    <!-- Temps -->
                     <div class="mb-10">
-                        <h3 class="text-2xl font-bold text-slate-800 mb-4">חשיבות הטמפרטורה</h3>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4">השפעת הטמפרטורה</h3>
                         <p class="mb-4">
-                            למים יש <strong>מוליכות חום (Thermal Conductivity)</strong> גבוהה פי 25 מאוויר. משמעות הדבר היא שהגוף מאבד או מקבל חום במים במהירות עצומה. לכן, שינוי קטן בטמפרטורה משנה דרמטית את האפקט הפיזיולוגי.
-                            <br>אנו מבחינים בין שני אפקטים עיקריים:
+                            למים מוליכות חום גבוהה פי 25 מאוויר, ולכן השפעתם על טמפרטורת הליבה של הגוף היא מהירה ומשמעותית.
+                            <br>אנו מבחינים בין שני טווחי השפעה:
                         </p>
                         <ul class="grid md:grid-cols-2 gap-4 mb-8">
                             <li class="bg-red-50 p-4 rounded-xl border border-red-100 text-red-900">
-                                <strong>אפקט סדטיבי (Sedative):</strong> מים חמים (33-36 מעלות). מרגיעים, מורידים טונוס שריר, מורידים לחץ דם, מרדימים.
+                                <strong>השפעה סדטיבית (Sedative):</strong> מים חמים (33-36°C). גורמים להרפיה, ירידה בטונוס השרירים, הרחבת כלי דם וירידה בלחץ הדם.
                             </li>
                             <li class="bg-blue-50 p-4 rounded-xl border border-blue-100 text-blue-900">
-                                <strong>אפקט סטימולנטי (Stimulant):</strong> מים קרים/פושרים (26-30 מעלות). מעוררים, מעלים טונוס שריר, מעלים דופק, ממריצים.
+                                <strong>השפעה סטימולנטית (Stimulant):</strong> מים קרירים (26-30°C). גורמים לעוררות, עלייה בטונוס, וכיווץ כלי דם פריפריים.
                             </li>
                         </ul>
 
                         <!-- Slider -->
                         <div class="bg-white p-6 md:p-8 rounded-3xl shadow-lg border border-slate-100 relative overflow-hidden">
                             <div class="flex justify-between items-end mb-6">
-                                <h4 class="font-bold text-slate-600">סרגל טמפרטורות אינטראקטיבי</h4>
+                                <h4 class="font-bold text-slate-600">סרגל טמפרטורות</h4>
                                 <span id="temp-display" class="text-5xl font-black text-sky-600">34°C</span>
                             </div>
                             <input type="range" min="10" max="42" value="34" class="w-full mb-8 h-8" oninput="updateTemp(this.value)">
@@ -454,7 +458,7 @@
                                     <div id="temp-effect" class="font-bold text-slate-700">הרפיה, איזון תרמי.</div>
                                 </div>
                                 <div>
-                                    <div class="text-xs font-bold text-slate-400 uppercase">שימושים</div>
+                                    <div class="text-xs font-bold text-slate-400 uppercase">התוויות קליניות</div>
                                     <div id="temp-use" class="font-bold text-slate-700">שיקום כללי, הליוויק.</div>
                                 </div>
                             </div>
@@ -464,42 +468,40 @@
                     <!-- Compresses -->
                     <div class="mb-12">
                         <h3 class="text-2xl font-bold text-slate-800 mb-4">טיפול מקומי: רטיות (Compresses)</h3>
-                        <p class="mb-4">לעתים נרצה לטפל באזור ספציפי מבלי להשפיע על כל הגוף. לשם כך נשתמש ברטיות.</p>
+                        <p class="mb-4">אמצעי לטיפול ממוקד באזור פגוע, ללא השפעה סיסטמית על כל הגוף.</p>
                         <div class="grid md:grid-cols-3 gap-4">
                             <div class="concept-card !border-r-blue-500">
                                 <h4 class="font-bold text-blue-800 mb-2">רטיות קרות</h4>
-                                <p class="text-sm">למצבים אקוטיים (נפיחות, דלקת טריה). מכווצות כלי דם ומאטות הולכה עצבית (אלחוש).</p>
+                                <p class="text-sm">אינדיקציה: שלב אקוטי (דלקת פעילה, נפיחות). מנגנון: כיווץ כלי דם והאטת הולכה עצבית (אלחוש).</p>
                             </div>
                             <div class="concept-card !border-r-red-500">
                                 <h4 class="font-bold text-red-800 mb-2">רטיות חמות</h4>
-                                <p class="text-sm">למצבים כרוניים, שרירים תפוסים וכאבי מחזור. מרחיבות כלי דם ומפנות רעלים.</p>
+                                <p class="text-sm">אינדיקציה: מצב כרוני, שרירים תפוסים. מנגנון: הרחבת כלי דם ופינוי תוצרי דלקת.</p>
                             </div>
                             <div class="concept-card !border-r-purple-500">
-                                <h4 class="font-bold text-purple-800 mb-2">אמבט ניגודים (Contrast)</h4>
-                                <p class="text-sm">חם-קר לסירוגין. יוצר אפקט "משאבה" לכלי הדם. מצוין להפחתת בצקות כרוניות ושיקום ספורטאים.</p>
+                                <h4 class="font-bold text-purple-800 mb-2">טיפול ניגודים (Contrast)</h4>
+                                <p class="text-sm">אינדיקציה: בצקות כרוניות ושיקום ספורטאים. מנגנון: יצירת "משאבה" וסקולרית על ידי כיווץ והרחבה לסירוגין.</p>
                             </div>
                         </div>
                     </div>
 
                     <!-- Methods -->
                     <div class="mb-12">
-                        <h3 class="text-2xl font-bold text-slate-800 mb-4">שיטות טיפול במים</h3>
-                        <p class="mb-4">נהוג לחלק את שיטות הטיפול לשתי קטגוריות, בהתאם למעורבות המטופל:</p>
-                        
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4">שיטות התערבות</h3>
                         <div class="space-y-4">
                             <div class="bg-white p-5 rounded-xl border border-slate-200">
-                                <h4 class="font-bold text-lg text-sky-700 mb-2">1. טיפול אקטיבי (המטופל פעיל)</h4>
+                                <h4 class="font-bold text-lg text-sky-700 mb-2">גישה אקטיבית (המטופל פעיל)</h4>
                                 <ul class="list-disc list-inside text-sm space-y-1">
-                                    <li><strong>Halliwick:</strong> שיטת 10 השלבים ללימוד שחייה ועצמאות. מבוססת על רוטציות ושליטה בשיווי משקל ללא עזרים.</li>
-                                    <li><strong>Bad Ragaz:</strong> שיטת התנגדות (PNF). המטופל צף עם תמיכה, המטפל משמש נקודת קיבוע לתרגילי חיזוק.</li>
-                                    <li><strong>Ai Chi:</strong> תנועות זורמות במים עמוקים. דגש על יציבה, נשימה ו-Core.</li>
+                                    <li><strong>Halliwick:</strong> שיטה המבוססת על הידרוסטטיקה ורוטציות. המטרה: הקניית עצמאות ושיווי משקל במים ללא עזרי ציפה.</li>
+                                    <li><strong>Bad Ragaz Ring Method:</strong> שיטת התנגדות (PNF) לחיזוק שרירים ושיפור טווחים, תוך שימוש במטפל כנקודת קיבוע.</li>
+                                    <li><strong>Ai Chi:</strong> רצף תנועות איטיות וזורמות במים עמוקים, בדגש על יציבה ונשימה סרעפתית.</li>
                                 </ul>
                             </div>
                             <div class="bg-white p-5 rounded-xl border border-slate-200">
-                                <h4 class="font-bold text-lg text-purple-700 mb-2">2. טיפול פסיבי (המטופל מוצף)</h4>
+                                <h4 class="font-bold text-lg text-purple-700 mb-2">גישה פסיבית (המטופל מוצף)</h4>
                                 <ul class="list-disc list-inside text-sm space-y-1">
-                                    <li><strong>Watsu (ווטסו):</strong> שילוב של מים (Water) ושיאצו (Shiatsu). תנועות עריסה, מתיחות ולחיצות במים חמים להרפיה עמוקה.</li>
-                                    <li><strong>Jahara:</strong> שיטה פסיבית המתמקדת בהארכת עמוד השדרה ושימוש ב"מקרוני" (מצוף) לתמיכה מבנית.</li>
+                                    <li><strong>Watsu (ווטסו):</strong> טכניקת גוף-נפש המשלבת ציפה, מתיחות ולחיצות (שיאצו) להרפיה עמוקה ושחרור מתח.</li>
+                                    <li><strong>Jahara:</strong> שיטה המתמקדת בהארכת עמוד השדרה (Traction) ושימוש בציוד ציפה תומך.</li>
                                 </ul>
                             </div>
                         </div>
@@ -509,30 +511,30 @@
                 <!-- 6. SAFETY -->
                 <section id="sec-safety" class="hidden fade-in">
                     <div class="mb-10 pb-4 border-b border-gray-200">
-                        <h2 class="text-3xl font-black text-slate-800 mb-3">בטיחות (Contraindications)</h2>
-                        <p class="text-xl text-slate-500">החלק החשוב ביותר: מתי אסור לטפל?</p>
+                        <h2 class="text-3xl font-black text-slate-800 mb-3">בטיחות והתוויות נגד (Contraindications)</h2>
+                        <p class="text-xl text-slate-500">פרוטוקולים לניהול סיכונים.</p>
                     </div>
 
                     <div class="bg-red-50 p-6 rounded-2xl border border-red-100 mb-8">
                         <h3 class="font-bold text-red-900 text-lg mb-4 flex items-center gap-2">
-                            <span class="animate-pulse">🚨</span> פרוטוקולי חירום
+                            <span class="animate-pulse">🚨</span> נוהל חירום בסביבה המימית
                         </h3>
                         <div class="grid md:grid-cols-2 gap-6 text-sm">
                             <div>
-                                <h4 class="font-bold text-red-800 underline mb-2">פרכוס אפילפטי במים</h4>
+                                <h4 class="font-bold text-red-800 underline mb-2">פרכוס אפילפטי</h4>
                                 <ol class="list-decimal list-inside space-y-1 text-red-900">
-                                    <li>תמיכה בראש המטופל מעל המים.</li>
-                                    <li><strong>אין להוציא מהמים</strong> בזמן ההתקף (סכנת פציעה).</li>
-                                    <li>הרחקה מקירות וחפצים.</li>
-                                    <li>לאחר סיום הרעד - הוצאה זהירה ובדיקת מדדים.</li>
+                                    <li>תמיכה בראש המטופל מעל פני המים.</li>
+                                    <li><strong>אין להוציא מהמים</strong> בזמן ההתקף הפעיל (למניעת פציעה).</li>
+                                    <li>הרחקה מקירות ואלמנטים קשיחים.</li>
+                                    <li>לאחר סיום הרעד - הוצאה זהירה ובדיקת מדדים חיוניים.</li>
                                 </ol>
                             </div>
                             <div>
                                 <h4 class="font-bold text-red-800 underline mb-2">דום לב / החייאה</h4>
                                 <ol class="list-decimal list-inside space-y-1 text-red-900">
-                                    <li>הוצאה <strong>מיידית</strong> ליבשה.</li>
-                                    <li>אין לבצע עיסוי לב במים (אין התנגדות לגב).</li>
-                                    <li>הזעקת עזרה רפואית.</li>
+                                    <li>הוצאה <strong>מיידית</strong> למשטח קשיח ביבשה.</li>
+                                    <li>אין לבצע עיסוי לב בתוך המים (חוסר אפקטיביות).</li>
+                                    <li>הפעלת נוהל חירום והזעקת עזרה.</li>
                                 </ol>
                             </div>
                         </div>
@@ -558,47 +560,67 @@
     <script>
         // --- DATA ---
         const safetyItems = [
-            { type: 'absolute', t: 'פצעים פתוחים', d: 'סכנת זיהום חמורה למטופל ולסביבה (זיהום המים).', e: 'Open Wounds' },
-            { type: 'absolute', t: 'מחלת לב אקוטית', d: 'עומס הנוזלים (700 מ"ל לחזה) עלול לגרום לקריסה לבבית.', e: 'Acute Heart Failure' },
-            { type: 'absolute', t: 'חום גבוה (מעל 38°)', d: 'הגוף לא יכול לקרר את עצמו במים חמים - סכנת מכת חום.', e: 'Fever' },
-            { type: 'absolute', t: 'שחפת פעילה', d: 'מחלה מדבקת דרך האוויר (מעל המים).', e: 'Active TB' },
-            { type: 'absolute', t: 'אי שליטה על סוגרים', d: 'ללא הגנה מתאימה - סכנת זיהום וסגירת הבריכה.', e: 'Incontinence' },
-            { type: 'absolute', t: 'אפילפסיה לא מאוזנת', d: 'סכנת טביעה מיידית בזמן התקף ללא שליטה.', e: 'Uncontrolled Epilepsy' },
-            { type: 'absolute', t: 'קיבולת ריאה נמוכה', d: 'מתחת ל-1 ליטר. הלחץ ההידרוסטטי ימנע נשימה תקינה.', e: 'Low Vital Capacity' },
-            { type: 'relative', t: 'סוכרת', d: 'סכנת היפוגליקמיה מוסווית (המים מסתירים הזעה ורעד). חובה למדוד סוכר.', e: 'Diabetes' },
-            { type: 'relative', t: 'לחץ דם לא מאוזן', d: 'מים חמים מורידים ל"ד (סכנת עילפון). מים קרים מעלים ל"ד.', e: 'BP Issues' },
-            { type: 'relative', t: 'טרשת נפוצה (MS)', d: 'רגישות לחום (תופעת אוהטהוף). חובה מים קרירים (<29°C).', e: 'Multiple Sclerosis' },
-            { type: 'relative', t: 'פחד מים (הידרופוביה)', d: 'גורם לטונוס שרירים מוגבר וחרדה. דורש עבודה פסיכולוגית והדרגתית.', e: 'Hydrophobia' },
-            { type: 'relative', t: 'רגישות לכלור', d: 'גירוי עורי או נשימתי.', e: 'Chlorine Sensitivity' }
+            { type: 'absolute', t: 'פצעים פתוחים', d: 'סכנת זיהום ודאית למטופל ולסביבה.', e: 'Open Wounds' },
+            { type: 'absolute', t: 'אי ספיקת לב אקוטית', d: 'הלחץ ההידרוסטטי מעמיס על הלב ועלול לגרום לכשל.', e: 'Acute Heart Failure' },
+            { type: 'absolute', t: 'חום גבוה (מעל 38°)', d: 'סיכון לדה-הידרציה ופגיעה בוויסות החום.', e: 'Fever' },
+            { type: 'absolute', t: 'שחפת פעילה', d: 'סכנת הדבקה נשימתית.', e: 'Active TB' },
+            { type: 'absolute', t: 'אי שליטה על סוגרים', d: 'ללא אמצעי הגנה מתאימים - סכנת זיהום ביולוגי.', e: 'Incontinence' },
+            { type: 'absolute', t: 'אפילפסיה בלתי מאוזנת', d: 'סכנת טביעה מיידית במקרה של התקף.', e: 'Uncontrolled Epilepsy' },
+            { type: 'absolute', t: 'קיבולת ריאה נמוכה', d: 'מתחת ל-1 ליטר. הלחץ ההידרוסטטי מגביל את הנשימה.', e: 'Low Vital Capacity' },
+            { type: 'relative', t: 'סוכרת', d: 'סכנת היפוגליקמיה סמויה (המים מסווים הזעה ורעד). חובה למדוד סוכר.', e: 'Diabetes' },
+            { type: 'relative', t: 'לחץ דם לא מאוזן', d: 'השפעה תרמית על כלי הדם. מים חמים עלולים לגרום לעילפון.', e: 'BP Issues' },
+            { type: 'relative', t: 'טרשת נפוצה (MS)', d: 'רגישות לחום (תופעת אוהטהוף). אינדיקציה למים קרירים בלבד.', e: 'Multiple Sclerosis' },
+            { type: 'relative', t: 'הידרופוביה', d: 'תגובת דחק (Stress) וטונוס שרירים מוגבר. דורש דה-סנסיטיזציה.', e: 'Hydrophobia' },
+            { type: 'relative', t: 'רגישות לכלור', d: 'גירוי נשימתי או עורי.', e: 'Chlorine Sensitivity' }
         ];
 
         const pages = ['intro', 'intake', 'physics', 'physiology', 'methods', 'safety'];
         
         // --- LOGIC ---
         function navTo(id) {
+            // Hide all pages
             pages.forEach(p => {
-                document.getElementById('sec-' + p)?.classList.add('hidden');
-                document.getElementById('nav-' + p)?.classList.remove('active');
+                const el = document.getElementById('sec-' + p);
+                if(el) el.classList.add('hidden');
+                
+                const nav = document.getElementById('nav-' + p);
+                if(nav) nav.classList.remove('active');
             });
             
+            // Show new page
             const target = document.getElementById('sec-' + id);
-            target?.classList.remove('hidden');
-            target?.classList.remove('fade-in');
-            void target?.offsetWidth;
-            target?.classList.add('fade-in');
+            if(target) {
+                target.classList.remove('hidden');
+                target.classList.remove('fade-in');
+                void target.offsetWidth; // Force Reflow
+                target.classList.add('fade-in');
+            }
 
-            document.getElementById('nav-' + id)?.classList.add('active');
-            document.getElementById('mobile-select').value = id;
-            document.getElementById('main-scroll').scrollTop = 0;
+            // Update UI
+            const activeNav = document.getElementById('nav-' + id);
+            if(activeNav) activeNav.classList.add('active');
             
+            const mobileSelect = document.getElementById('mobile-select');
+            if(mobileSelect) mobileSelect.value = id;
+            
+            // Header Title
             const titles = {'intro':'מבוא','intake':'קבלה','physics':'פיזיקה','physiology':'פיזיולוגיה','methods':'שיטות','safety':'בטיחות'};
-            document.getElementById('header-topic').innerText = titles[id];
+            const header = document.getElementById('header-topic');
+            if(header) header.innerText = titles[id];
+
+            // SCROLL RESET - CRITICAL FIX
+            window.scrollTo(0, 0); // Mobile Body Scroll
+            const mainContainer = document.getElementById('main-scroll');
+            if(mainContainer) mainContainer.scrollTop = 0; // Desktop Container Scroll
+
             renderBottomNav(id);
         }
 
         function renderBottomNav(curr) {
             const idx = pages.indexOf(curr);
             const container = document.getElementById('bottom-nav');
+            if(!container) return;
+            
             container.innerHTML = '';
 
             if (idx > 0) {
@@ -621,7 +643,8 @@
         function calcPhy() {
             const w = parseFloat(document.getElementById('phy-weight').value) || 0;
             const factor = parseFloat(document.getElementById('phy-depth').value);
-            document.getElementById('phy-result').innerText = (w * factor).toFixed(1);
+            const res = document.getElementById('phy-result');
+            if(res) res.innerText = (w * factor).toFixed(1);
         }
 
         function updateTemp(val) {
@@ -629,30 +652,32 @@
             const d = document.getElementById('temp-display');
             const e = document.getElementById('temp-effect');
             const u = document.getElementById('temp-use');
-            d.innerText = t + "°C";
+            if(d) d.innerText = t + "°C";
             
             if (t <= 20) {
                 d.className = "text-5xl font-black text-blue-600";
-                e.innerText = "כיווץ כלי דם, אלחוש, הפחתת דלקת (סטימולנטי).";
-                u.innerText = "ספורטאים (קרח), דלקת אקוטית.";
+                e.innerText = "סטימולציה, כיווץ כלי דם, אלחוש.";
+                u.innerText = "התאוששות ספורטאים (קרח), שלב אקוטי.";
             } else if (t <= 29) {
                 d.className = "text-5xl font-black text-sky-500";
-                e.innerText = "סטימולציה, שמירה על טונוס, מניעת חימום.";
-                u.innerText = "שחייה תחרותית, טרשת נפוצה (MS).";
+                e.innerText = "ערנות, שמירה על טונוס, מניעת היפרתרמיה.";
+                u.innerText = "שחייה ספורטיבית, טרשת נפוצה (MS).";
             } else if (t <= 36) {
                 d.className = "text-5xl font-black text-amber-500";
                 e.innerText = "איזון תרמי (Neutral), הרפיה מתונה.";
-                u.innerText = "שיקום אורתופדי, הליוויק, ילדים, CP.";
+                u.innerText = "שיקום אורתופדי/נוירולוגי, הליוויק, ילדים.";
             } else {
                 d.className = "text-5xl font-black text-red-500";
-                e.innerText = "סדציה (הרגעה), הרחבת כלי דם, הורדת ל״ד.";
-                u.innerText = "כאב כרוני, וואטסו, ספא, שחרור שרירים.";
+                e.innerText = "סדציה, הרחבת כלי דם, ירידת ל״ד.";
+                u.innerText = "כאב כרוני, הרפיה עמוקה (Watsu), ספא.";
             }
         }
 
         function renderSafety(filter) {
             const grid = document.getElementById('safety-grid');
+            if(!grid) return;
             grid.innerHTML = '';
+            
             safetyItems.filter(i => filter === 'all' || i.type === filter).forEach(item => {
                 const isAbs = item.type === 'absolute';
                 const div = document.createElement('div');
