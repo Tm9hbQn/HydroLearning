@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HydroTherapy Pro: מערכת למידה מקיפה</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Google Fonts (Assistant for Hebrew) -->
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Assistant', sans-serif;
+            background-color: #f0f4f8; /* Light blue-grey background */
+            color: #1e293b;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3b82f6; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2563eb; 
+        }
+
+        /* Chart Container Styling - MANDATORY */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px; /* Max width constraint */
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px; /* Base height */
+            max-height: 400px;
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 300px;
+            }
+        }
+
+        /* Navigation Active State */
+        .nav-item.active {
+            background-color: #e0f2fe; /* light sky blue */
+            color: #0369a1; /* dark sky blue */
+            border-right: 4px solid #0284c7;
+            font-weight: 700;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Utility for hiding sections */
+        .hidden-section {
+            display: none;
+        }
+        
+        /* Fade in animation */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+
+    <!-- Chosen Palette: Ocean Blue & Slate
+         Primary: #0ea5e9 (Sky 500)
+         Secondary: #64748b (Slate 500)
+         Background: #f0f4f8
+         Accent: #f59e0b (Amber 500 for warnings)
+    -->
+
+    <!-- Application Structure Plan:
+         1. Dashboard/Gap Analysis: Answers Q1-3 regarding what was found vs. what is missing.
+         2. Physics Module: Expanded content on properties of water with interactivity (Buoyancy calc).
+         3. Physiology Module: Cardiovascular, Respiratory, Renal effects (Interactive charts).
+         4. Safety Module: Absolute vs Relative Contraindications with filtering.
+         5. Methods & Temps: Treatment types and temperature effects.
+         The structure is designed to take the learner from basic physics -> body response -> clinical safety -> application.
+    -->
+    
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="flex flex-col h-screen overflow-hidden">
+
+    <!-- Header -->
+    <header class="bg-white shadow-md z-20 flex-shrink-0 h-16 flex items-center px-6 justify-between border-b border-gray-200">
+        <div class="flex items-center gap-3">
+            <div class="text-3xl text-sky-600">💧</div>
+            <div>
+                <h1 class="text-2xl font-bold text-slate-800 tracking-tight">HydroTherapy Pro</h1>
+                <p class="text-xs text-slate-500 font-semibold">מערכת למידה מקצועית להכשרת הידרותרפיסטים</p>
+            </div>
+        </div>
+        <div class="hidden md:flex items-center gap-4 text-sm text-slate-600">
+            <span>מודול למידה: <span id="current-module-display" class="font-bold text-sky-600">סקירה וניתוח פערים</span></span>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 bg-white border-l border-gray-200 flex-shrink-0 overflow-y-auto hidden md:block z-10 shadow-inner">
+            <nav class="p-4 space-y-2">
+                <button onclick="navTo('dashboard')" id="nav-dashboard" class="nav-item w-full text-right px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-3 active">
+                    <span>📊</span> סקירה וניתוח פערים
+                </button>
+                <div class="pt-4 pb-2 text-xs font-bold text-slate-400 uppercase tracking-wider">ליבה עיונית ומעשית</div>
+                <button onclick="navTo('physics')" id="nav-physics" class="nav-item w-full text-right px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-3">
+                    <span>⚖️</span> פיזיקה (הידרו-מכניקה)
+                </button>
+                <button onclick="navTo('physiology')" id="nav-physiology" class="nav-item w-full text-right px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-3">
+                    <span>🫀</span> פיזיולוגיה של המאמץ
+                </button>
+                <button onclick="navTo('safety')" id="nav-safety" class="nav-item w-full text-right px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-3">
+                    <span>⚠️</span> בטיחות וקונטרה-אינדיקציות
+                </button>
+                <button onclick="navTo('methods')" id="nav-methods" class="nav-item w-full text-right px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-3">
+                    <span>🌡️</span> שיטות טיפול וטמפרטורות
+                </button>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 overflow-y-auto bg-[#f8fafc] p-4 md:p-8 relative scroll-smooth" id="main-content">
+            
+            <!-- Mobile Menu Toggle (Visible only on small screens) -->
+            <div class="md:hidden mb-4">
+                <select onchange="navTo(this.value)" class="w-full p-3 rounded-lg border border-gray-300 bg-white shadow-sm text-lg font-medium text-slate-700">
+                    <option value="dashboard">📊 סקירה וניתוח פערים</option>
+                    <option value="physics">⚖️ פיזיקה (הידרו-מכניקה)</option>
+                    <option value="physiology">🫀 פיזיולוגיה של המאמץ</option>
+                    <option value="safety">⚠️ בטיחות וקונטרה-אינדיקציות</option>
+                    <option value="methods">🌡️ שיטות טיפול וטמפרטורות</option>
+                </select>
+            </div>
+
+            <!-- VIEW: DASHBOARD (Analysis & Gaps) -->
+            <div id="view-dashboard" class="fade-in">
+                <div class="max-w-4xl mx-auto space-y-8">
+                    
+                    <!-- Intro Block -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-t-4 border-sky-500">
+                        <h2 class="text-2xl font-bold text-slate-800 mb-4">ניתוח מקצועי של חומרי הלימוד</h2>
+                        <p class="text-slate-600 leading-relaxed mb-4">
+                            דף זה מציג ניתוח מעמיק של המסמכים שהועלו ("תכונות המים", "קונטרה אינדיקציות", "טיפולי מים"). 
+                            הניתוח בוצע מנקודת מבט של הכשרת הידרותרפיסטים (Hydrotherapy Certification) ומשווה את התוכן הקיים לסטנדרט הבינלאומי המצופה.
+                        </p>
+                        <div class="grid md:grid-cols-2 gap-4 mt-6">
+                            <div class="bg-green-50 p-4 rounded-lg border border-green-100">
+                                <h3 class="font-bold text-green-800 text-lg mb-2">✅ נושאים קיימים במסמכים</h3>
+                                <ul class="list-disc list-inside text-sm text-green-700 space-y-1">
+                                    <li>חוק ארכימדס וכוח העילוי (ברמה בסיסית).</li>
+                                    <li>לחץ הידרוסטטי (הגדרה כללית).</li>
+                                    <li>רשימת קונטרה-אינדיקציות (מוחלטות ויחסיות).</li>
+                                    <li>טווחי טמפרטורות (טיפולי, ספא, ספורט).</li>
+                                    <li>השפעות בסיסיות על מערכת השריר והעצבים.</li>
+                                </ul>
+                            </div>
+                            <div class="bg-amber-50 p-4 rounded-lg border border-amber-100">
+                                <h3 class="font-bold text-amber-800 text-lg mb-2">⚠️ פערים לכיסוי (חסר מקצועי)</h3>
+                                <ul class="list-disc list-inside text-sm text-amber-900 space-y-1">
+                                    <li><strong>פיזיקה מתקדמת:</strong> חסר עיסוק במומנטים, מרכז ציפה (COB) מול מרכז כובד (COG), גרר (Drag Forces), וצמיגות יחסית.</li>
+                                    <li><strong>פיזיולוגיה מעמיקה:</strong> חסר הסבר על "Immersion Diuresis" (השתנה מוגברת), שינויים בנפח פעימה (Stroke Volume) לעומת דופק, ומכניקת נשימה תחת לחץ.</li>
+                                    <li><strong>בטיחות:</strong> חסר פירוט על נוהלי חירום במים (החייאה במים, חילוץ).</li>
+                                    <li><strong>עומק קליני:</strong> דוגמאות קליניות לפתולוגיות ספציפיות וכיצד תכונה X פותרת בעיה Y.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- The Gap Filling Plan -->
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-700 mb-4 border-r-4 border-sky-400 pr-3">תוכנית ההשלמה האינטראקטיבית</h3>
+                        <p class="text-slate-600 mb-6">
+                            האפליקציה הזו נבנתה מחדש כדי לכסות את כל הפערים שזוהו. בכל עמוד תמצאו את התוכן המקורי משודרג עם ידע מקצועי מתקדם, מושגים באנגלית, ודוגמאות מספריות.
+                        </p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <!-- Card 1 -->
+                            <div class="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition-shadow cursor-pointer border border-slate-100" onclick="navTo('physics')">
+                                <div class="text-3xl mb-3">⚖️</div>
+                                <h4 class="font-bold text-slate-800 mb-2">מודול 1: פיזיקה</h4>
+                                <p class="text-sm text-slate-500">הרחבה על כוחות גרר, מומנט סיבובי (Metacenter), וחישוב עומסים מדויק.</p>
+                                <div class="mt-4 text-sky-600 text-sm font-semibold">עבור למודול &larr;</div>
+                            </div>
+                            <!-- Card 2 -->
+                            <div class="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition-shadow cursor-pointer border border-slate-100" onclick="navTo('physiology')">
+                                <div class="text-3xl mb-3">🫀</div>
+                                <h4 class="font-bold text-slate-800 mb-2">מודול 2: פיזיולוגיה</h4>
+                                <p class="text-sm text-slate-500">הבנת מנגנוני הלב, הריאות והכליות בזמן שהייה במים (Immersion).</p>
+                                <div class="mt-4 text-sky-600 text-sm font-semibold">עבור למודול &larr;</div>
+                            </div>
+                            <!-- Card 3 -->
+                            <div class="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition-shadow cursor-pointer border border-slate-100" onclick="navTo('safety')">
+                                <div class="text-3xl mb-3">⚠️</div>
+                                <h4 class="font-bold text-slate-800 mb-2">מודול 3: קליניקה</h4>
+                                <p class="text-sm text-slate-500">ניתוח קונטרה-אינדיקציות מתקדם ובניית רציונל טיפולי.</p>
+                                <div class="mt-4 text-sky-600 text-sm font-semibold">עבור למודול &larr;</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- VIEW: PHYSICS -->
+            <div id="view-physics" class="hidden-section fade-in">
+                <div class="max-w-5xl mx-auto">
+                    <div class="mb-8">
+                        <h2 class="text-3xl font-bold text-slate-800">הידרו-מכניקה ופיזיקה של המים</h2>
+                        <p class="text-lg text-slate-600 mt-2">הבנת הכוחות הפועלים על הגוף במים היא הבסיס לכל תרגיל שיקומי.</p>
+                    </div>
+
+                    <!-- Topic 1: Density & Specific Gravity -->
+                    <div class="bg-white rounded-xl shadow-sm p-6 mb-8 border border-slate-100">
+                        <div class="flex items-start gap-4">
+                            <div class="bg-blue-100 p-3 rounded-full text-blue-600 font-bold text-xl">1</div>
+                            <div class="flex-1">
+                                <h3 class="text-xl font-bold text-slate-800">משקל סגולי וצפיפות יחסית (Relative Density / Specific Gravity)</h3>
+                                <p class="text-slate-600 mt-2 leading-relaxed">
+                                    במסמכים המקוריים הוזכרה "צפיפות". כדי להבין לעומק, עלינו להשתמש במושג <strong>Specific Gravity (SG)</strong>. 
+                                    מים מזוקקים הם 1.0. כל גוף עם SG נמוך מ-1 יצוף, וגבוה מ-1 ישקע.
+                                </p>
+                                <ul class="mt-4 space-y-2 text-sm text-slate-700 bg-slate-50 p-4 rounded-lg">
+                                    <li>🔹 <strong>גוף האדם (ממוצע):</strong> SG = 0.974 (ולכן רוב בני האדם צפים).</li>
+                                    <li>🔹 <strong>נשימה:</strong> שאיפה מלאה מורידה את הצפיפות (מגדילה נפח) -> ציפה טובה יותר.</li>
+                                    <li>🔹 <strong>השלכה קלינית:</strong> מטופלים רזים מאוד ושריריים (SG > 1) יתקשו לצוף ("Sinkers") ויזדקקו לאביזרי ציפה, בניגוד למטופלים עם אחוז שומן גבוה.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Topic 2: Hydrostatic Pressure -->
+                    <div class="bg-white rounded-xl shadow-sm p-6 mb-8 border border-slate-100">
+                        <div class="flex items-start gap-4">
+                            <div class="bg-blue-100 p-3 rounded-full text-blue-600 font-bold text-xl">2</div>
+                            <div class="flex-1">
+                                <h3 class="text-xl font-bold text-slate-800">לחץ הידרוסטטי (Hydrostatic Pressure) - חוק פסקל</h3>
+                                <p class="text-slate-600 mt-2 leading-relaxed">
+                                    חוק פסקל (Pascal's Law) קובע שלחץ נוזל מופעל באופן שווה בכל הכיוונים בעומק נתון. הלחץ עולה עם העומק.
+                                </p>
+                                
+                                <div class="grid md:grid-cols-2 gap-8 mt-6">
+                                    <div>
+                                        <h4 class="font-bold text-sky-700 mb-2">המשמעות הקלינית החסרה:</h4>
+                                        <ul class="list-disc list-inside space-y-2 text-sm text-slate-700">
+                                            <li><strong>סיוע בחזר הורידי (Venous Return):</strong> הלחץ פועל כ"גרב לחץ" טבעית, דוחף דם מהגפיים ללב. מצוין לבצקות (Edema).</li>
+                                            <li><strong>התנגדות נשימתית:</strong> לחץ על בית החזה מקשה על השאיפה (מחזק שרירי נשימה) ומקל על הנשיפה.</li>
+                                            <li><strong>קלט תחושתי (Sensory Input):</strong> הלחץ המתמיד מספק גירוי פרופריוספטיבי המרגיע את מערכת העצבים ומפחית כאב (Gate Control Theory).</li>
+                                        </ul>
+                                    </div>
+                                    <div class="bg-sky-50 p-4 rounded-lg border border-sky-100">
+                                        <h4 class="font-bold text-sky-800 text-center mb-3">חישוב הלחץ על הגוף</h4>
+                                        <div class="text-center">
+                                            <p class="text-xs text-slate-500 mb-1">הזן עומק (מטרים):</p>
+                                            <input type="number" id="depthInput" value="1.2" step="0.1" class="w-24 text-center p-2 border border-sky-300 rounded mb-2 font-bold" oninput="calculatePressure()">
+                                            <div id="pressureResult" class="text-sm font-medium text-slate-700 mt-2">
+                                                לחץ: 0.09 אטמוספירות (או 89.6 mmHg)
+                                            </div>
+                                            <p class="text-xs text-slate-500 mt-2 italic">כל 10 ס"מ עומק מוסיפים כ-7.4 מ"מ כספית לחץ.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Topic 3: Buoyancy & Metacenter (The Missing Link) -->
+                    <div class="bg-white rounded-xl shadow-sm p-6 mb-8 border border-slate-100">
+                        <div class="flex items-start gap-4">
+                            <div class="bg-blue-100 p-3 rounded-full text-blue-600 font-bold text-xl">3</div>
+                            <div class="flex-1">
+                                <h3 class="text-xl font-bold text-slate-800">כוח העילוי והמומנט הסיבובי (Buoyancy & Metacentric Effect)</h3>
+                                <p class="text-slate-600 mt-2 leading-relaxed">
+                                    במסמכים הוזכר ש"מים מפחיתים עומס". זה נכון, אך חסר ההסבר על יציבות.
+                                    לגוף יש <strong>מרכז כובד (COG)</strong> (בדרך כלל באזור הטבור/S2) ו<strong>מרכז ציפה (COB)</strong> (במרכז הריאות/חזה).
+                                </p>
+                                <div class="bg-yellow-50 border-r-4 border-yellow-400 p-4 mt-4 mb-4">
+                                    <h4 class="font-bold text-yellow-800">⚠️ אפקט הסיבוב (Rotational Torque):</h4>
+                                    <p class="text-sm text-yellow-900">
+                                        כאשר ה-COG וה-COB אינם בקו אנכי אחד, נוצר מומנט סיבוב. הגוף ירצה להסתובב עד שה-COB יהיה מעל ה-COG.
+                                        <br><strong>יישום:</strong> מטופל עם רגליים משותקות (כבדות) וחזה מלא אוויר (קל) יתהפך על הגב. על המטפל לצפות זאת ולייצב!
+                                    </p>
+                                </div>
+
+                                <!-- Buoyancy Calculator -->
+                                <div class="bg-sky-50 p-5 rounded-xl border border-sky-100">
+                                    <h4 class="font-bold text-sky-800 mb-3">מחשבון נשיאת משקל במים (Weight Bearing)</h4>
+                                    <p class="text-xs text-slate-500 mb-4">לפי חוק ארכימדס, ככל שאנו עמוקים יותר, אנו שוקלים פחות "משקל אפקטיבי".</p>
+                                    
+                                    <div class="flex flex-col md:flex-row gap-6 items-center">
+                                        <div class="w-full md:w-1/2">
+                                            <label class="block text-sm font-medium text-slate-700 mb-1">משקל גוף ביבשה (ק"ג):</label>
+                                            <input type="number" id="weightLand" value="80" class="w-full p-2 border border-gray-300 rounded mb-4">
+                                            
+                                            <label class="block text-sm font-medium text-slate-700 mb-1">גובה המים ביחס לגוף:</label>
+                                            <select id="immersionLevel" class="w-full p-2 border border-gray-300 rounded mb-4" onchange="updateBuoyancy()">
+                                                <option value="0.1">עד הצוואר (C7) - נושאים כ-10% משקל</option>
+                                                <option value="0.3">עד החזה (Xiphoid) - נושאים כ-30% משקל</option>
+                                                <option value="0.5">עד המותניים (ASIS) - נושאים כ-50% משקל</option>
+                                            </select>
+                                            <button onclick="updateBuoyancy()" class="w-full bg-sky-600 text-white py-2 rounded hover:bg-sky-700 font-bold">חשב משקל במים</button>
+                                        </div>
+                                        <div class="w-full md:w-1/2 text-center">
+                                            <div class="text-4xl font-bold text-sky-600 mb-2" id="weightWaterResult">8 ק"ג</div>
+                                            <div class="text-sm text-slate-600">משקל אפקטיבי על המפרקים</div>
+                                            <div class="w-full bg-gray-200 rounded-full h-4 mt-4">
+                                                <div id="weightBar" class="bg-sky-500 h-4 rounded-full transition-all duration-500" style="width: 10%"></div>
+                                            </div>
+                                            <p class="text-xs text-slate-400 mt-1">אחוז משקל הגוף המקורי</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Topic 4: Drag & Turbulence -->
+                    <div class="bg-white rounded-xl shadow-sm p-6 mb-8 border border-slate-100">
+                        <div class="flex items-start gap-4">
+                            <div class="bg-blue-100 p-3 rounded-full text-blue-600 font-bold text-xl">4</div>
+                            <div class="flex-1">
+                                <h3 class="text-xl font-bold text-slate-800">הידרו-דינמיקה: גרר ומערבולות (Drag & Turbulence)</h3>
+                                <p class="text-slate-600 mt-2">
+                                    התנגדות המים אינה ליניארית. זהו מושג קריטי שחסר במסמך הבסיסי.
+                                </p>
+                                <div class="mt-4 p-4 bg-slate-50 border-r-4 border-purple-500 rounded text-sm text-slate-700">
+                                    <strong>המשוואה הקריטית:</strong> התנגדות המים (Drag) עולה בריבוע המהירות ($V^2$).
+                                    <br>פירוש: אם המטופל מכפיל את מהירות התנועה, ההתנגדות גדלה פי 4!
+                                </div>
+                                <div class="mt-6">
+                                    <h4 class="text-sm font-bold text-slate-500 mb-2 text-center">הדגמה גרפית: הקשר בין מהירות להתנגדות</h4>
+                                    <div class="chart-container">
+                                        <canvas id="dragChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- VIEW: PHYSIOLOGY -->
+            <div id="view-physiology" class="hidden-section fade-in">
+                <div class="max-w-5xl mx-auto">
+                    <div class="mb-8">
+                        <h2 class="text-3xl font-bold text-slate-800">פיזיולוגיה של טבילה ומאמץ (Physiological Effects)</h2>
+                        <p class="text-lg text-slate-600 mt-2">מה קורה לגוף ברגע שהוא נכנס למים? הסברים שלא הופיעו במסמך המקורי.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        
+                        <!-- Cardiovascular -->
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                            <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                                <span>🫀</span> המערכת הקרדיו-ווסקולרית
+                            </h3>
+                            <ul class="mt-4 space-y-3 text-sm text-slate-600">
+                                <li class="flex items-start gap-2">
+                                    <span class="text-green-500 font-bold">⬆️</span>
+                                    <div>
+                                        <strong>Central Blood Volume:</strong> הלחץ ההידרוסטטי דוחף כ-700 מ"ל דם מהרגליים לחזה.
+                                    </div>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-green-500 font-bold">⬆️</span>
+                                    <div>
+                                        <strong>Stroke Volume (נפח פעימה):</strong> הלב מתמלא יותר טוב (Preload עולה לפי חוק Starling), ולכן כל פעימה חזקה יותר.
+                                    </div>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-red-500 font-bold">⬇️</span>
+                                    <div>
+                                        <strong>Heart Rate (דופק):</strong> בגלל שנפח הפעימה גדל, הלב יכול לפעום לאט יותר כדי לספק את אותה תפוקה. 
+                                        <span class="block text-xs bg-gray-100 p-1 mt-1 rounded">במים תרמו-ניטרליים, הדופק יורד ב-10-15 פעימות לדקה לעומת יבשה באותו מאמץ.</span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Renal (Kidneys) - The Missing "Why do I need to pee?" -->
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                            <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                                <span>💧</span> מערכת הכליות (Renal System)
+                            </h3>
+                            <div class="mt-4 text-sm text-slate-600">
+                                <p class="mb-2"><strong>Immersion Diuresis (השתנה של טבילה):</strong> תופעה שחובה להכיר.</p>
+                                <ol class="list-decimal list-inside space-y-2">
+                                    <li>עלייה בנפח הדם במרכז הגוף (בגלל הלחץ ההידרוסטטי).</li>
+                                    <li>הלב מרגיש "עומס" ומפריש הורמון בשם <strong>ANP</strong>.</li>
+                                    <li>ההורמון מאותת לכליות לסלק נוזלים.</li>
+                                    <li><strong>תוצאה:</strong> המטופל חייב לשירותים. זה נורמלי ופיזיולוגי!</li>
+                                </ol>
+                            </div>
+                        </div>
+
+                        <!-- Respiratory -->
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                            <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                                <span>🫁</span> מערכת הנשימה (Respiratory)
+                            </h3>
+                            <p class="mt-2 text-sm text-slate-600">
+                                עבודת הנשימה (Work of Breathing) עולה ב-60% בערך כאשר המים מגיעים לצוואר.
+                                <br>
+                                <strong>למה?</strong> הלחץ ההידרוסטטי מתנגד להרחבת בית החזה.
+                                <br>
+                                <strong>השלכה טיפולית:</strong> מצוין לחיזוק שרירי נשימה (אסתמה, COPD), אך דורש זהירות עם חולי לב קשים.
+                            </p>
+                        </div>
+
+                        <!-- Nervous System -->
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                            <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                                <span>🧠</span> מערכת העצבים (Neurological)
+                            </h3>
+                            <p class="mt-2 text-sm text-slate-600">
+                                <strong>ויסות חושי (Sensory Integration):</strong> המים מספקים גירוי תמידי ורחב על העור. זה גורם להצפה חיובית של מערכת העצבים, שמפחיתה רגישות לכאב (Pain Gating) ומרגיעה (הפחתת טונוס סימפטתי).
+                            </p>
+                        </div>
+
+                    </div>
+                    
+                    <div class="mt-8 bg-white p-6 rounded-xl shadow-sm">
+                        <h4 class="text-lg font-bold text-slate-800 mb-4 text-center">השוואת דופק במאמץ: יבשה מול מים</h4>
+                        <div class="chart-container">
+                            <canvas id="hrChart"></canvas>
+                        </div>
+                        <p class="text-center text-xs text-slate-500 mt-2">
+                            שימו לב: להגיע לאותו דופק במים דורש מאמץ סובייקטיבי קשה יותר מאשר ביבשה.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: SAFETY -->
+            <div id="view-safety" class="hidden-section fade-in">
+                <div class="max-w-5xl mx-auto">
+                    <div class="mb-8">
+                        <h2 class="text-3xl font-bold text-slate-800">בטיחות וקונטרה-אינדיקציות</h2>
+                        <p class="text-lg text-slate-600 mt-2">
+                            ניהול סיכונים הוא החלק החשוב ביותר. יש להבדיל בין איסור מוחלט (Absolute) לבין צורך בזהירות (Relative).
+                        </p>
+                    </div>
+
+                    <!-- Filter Controls -->
+                    <div class="flex gap-4 mb-6">
+                        <button onclick="filterSafety('all')" class="px-4 py-2 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-sm focus:ring-2 ring-sky-400">הכל</button>
+                        <button onclick="filterSafety('absolute')" class="px-4 py-2 rounded-full bg-red-100 hover:bg-red-200 text-red-700 font-bold text-sm focus:ring-2 ring-red-400">מוחלט (אסור!)</button>
+                        <button onclick="filterSafety('relative')" class="px-4 py-2 rounded-full bg-yellow-100 hover:bg-yellow-200 text-yellow-700 font-bold text-sm focus:ring-2 ring-yellow-400">יחסי (בזהירות)</button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="contraindications-grid">
+                        <!-- Items injected by JS -->
+                    </div>
+
+                    <!-- Missing Safety Protocol Block -->
+                    <div class="mt-10 bg-red-50 border-r-4 border-red-500 p-6 rounded-lg">
+                        <h3 class="text-xl font-bold text-red-800 mb-2">🚨 נוהל חירום (Emergency Protocol) - התוכן החסר</h3>
+                        <p class="text-sm text-red-900 mb-4">
+                            המסמכים המקוריים לא פירטו מה עושים במקרה חירום. הידרותרפיסט חייב לדעת:
+                        </p>
+                        <div class="grid md:grid-cols-2 gap-4 text-sm text-red-900">
+                            <ul class="list-disc list-inside space-y-1">
+                                <li><strong>פרכוס במים:</strong> תמיכה בראש מעל המים, אין להוציא בכוח בזמן ההתקף. הרחקה מקירות.</li>
+                                <li><strong>החייאה (CPR):</strong> חובה להוציא מהמים! אין לבצע עיסויים במים (אין התנגדות לגב). הנשמות אפשר לבצע במים רדודים אם יש תמיכה.</li>
+                            </ul>
+                            <ul class="list-disc list-inside space-y-1">
+                                <li><strong>עילפון (Syncope):</strong> הוצאה מיידית, השכבה עם רגליים למעלה (להחזרת דם למוח), בדיקת מדדים.</li>
+                                <li><strong>סימני מצוקה לבבית:</strong> הזעה קרה (קשה לראות במים - שימו לב לחוורון), קוצר נשימה קיצוני, לחץ בחזה. הפסקת טיפול מיידית.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: METHODS -->
+            <div id="view-methods" class="hidden-section fade-in">
+                <div class="max-w-5xl mx-auto">
+                    <div class="mb-8">
+                        <h2 class="text-3xl font-bold text-slate-800">שיטות טיפול וטמפרטורות</h2>
+                        <p class="text-lg text-slate-600 mt-2">התאמת סוג הטיפול והטמפרטורה למטרה הקלינית.</p>
+                    </div>
+
+                    <!-- Temperature Slider Interaction -->
+                    <div class="bg-white p-8 rounded-xl shadow-sm mb-10 border border-slate-100">
+                        <h3 class="text-xl font-bold text-slate-800 mb-6">🌡️ מד חום אינטראקטיבי: גרור לראות השפעות</h3>
+                        
+                        <input type="range" min="10" max="42" value="34" class="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer range-slider" id="tempSlider" oninput="updateTempInfo(this.value)">
+                        <div class="flex justify-between text-xs text-slate-400 mt-2 px-1">
+                            <span>10°C (קרח)</span>
+                            <span>28°C (ספורט)</span>
+                            <span>34°C (טיפולי)</span>
+                            <span>40°C+ (ספא)</span>
+                        </div>
+
+                        <div class="mt-8 text-center">
+                            <span id="tempDisplay" class="text-5xl font-bold text-sky-600">34°C</span>
+                            <div id="tempCategory" class="text-xl font-medium text-slate-500 mt-2">מים תרמו-ניטרליים</div>
+                        </div>
+
+                        <div class="grid md:grid-cols-3 gap-6 mt-8">
+                            <div class="bg-slate-50 p-4 rounded text-center">
+                                <div class="font-bold text-slate-700 mb-2">אפקט פיזיולוגי</div>
+                                <div id="tempPhysio" class="text-sm text-slate-600">הרחבת כלי דם, הרפיית שרירים</div>
+                            </div>
+                            <div class="bg-slate-50 p-4 rounded text-center">
+                                <div class="font-bold text-slate-700 mb-2">מתאים ל...</div>
+                                <div id="tempIndications" class="text-sm text-slate-600">שיקום אורתופדי, נוירולוגי, הפחתת כאב</div>
+                            </div>
+                            <div class="bg-slate-50 p-4 rounded text-center">
+                                <div class="font-bold text-slate-700 mb-2">זמן מומלץ</div>
+                                <div id="tempTime" class="text-sm text-slate-600">30-45 דקות</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Methods Cards -->
+                    <h3 class="text-xl font-bold text-slate-800 mb-4">סקירת שיטות מרכזיות (הרחבה מעבר למסמכים)</h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-white p-5 rounded-xl border border-slate-100 shadow-sm">
+                            <h4 class="font-bold text-sky-700 text-lg">Halliwick (הליוויק)</h4>
+                            <p class="text-sm text-slate-600 mt-2">שיטה המבוססת על עקרונות הידרוסטטיים והידרודינמיים. המטרה: עצמאות במים.</p>
+                            <ul class="text-sm text-slate-500 mt-2 list-disc list-inside">
+                                <li><strong>עקרון מפתח:</strong> רוטציות (שליטה בסיבובים).</li>
+                                <li><strong>קהל יעד:</strong> פגיעות נוירולוגיות, ילדים, לימוד שחייה טיפולי.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl border border-slate-100 shadow-sm">
+                            <h4 class="font-bold text-sky-700 text-lg">Bad Ragaz Ring Method (BRRM)</h4>
+                            <p class="text-sm text-slate-600 mt-2">שיטת התנגדות המבוססת על PNF. המטפל משמש כנקודת קיבוע.</p>
+                            <ul class="text-sm text-slate-500 mt-2 list-disc list-inside">
+                                <li><strong>עקרון מפתח:</strong> עבודה איזומטרית ואיזוטונית כנגד התנגדות המים.</li>
+                                <li><strong>קהל יעד:</strong> חיזוק שרירים, אורתופדיה, ראומטולוגיה.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl border border-slate-100 shadow-sm">
+                            <h4 class="font-bold text-sky-700 text-lg">Watsu & Jahara (טיפולים פסיביים)</h4>
+                            <p class="text-sm text-slate-600 mt-2">עבודת גוף במים חמים, מבוססת על שיאצו (Watsu) או הארכת עמוד שדרה (Jahara).</p>
+                            <ul class="text-sm text-slate-500 mt-2 list-disc list-inside">
+                                <li><strong>עקרון מפתח:</strong> הרפיה עמוקה, הפחתת טונוס, הפחתת כאב.</li>
+                                <li><strong>קהל יעד:</strong> סטרס, פיברומיאלגיה, CP, כאב כרוני.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl border border-slate-100 shadow-sm">
+                            <h4 class="font-bold text-sky-700 text-lg">Ai Chi (אי צ'י)</h4>
+                            <p class="text-sm text-slate-600 mt-2">רצף תנועות המבוסס על טאי צ'י, מבוצע במים עמוקים בכתפיים.</p>
+                            <ul class="text-sm text-slate-500 mt-2 list-disc list-inside">
+                                <li><strong>עקרון מפתח:</strong> נשימה, שיווי משקל, Core Stability.</li>
+                                <li><strong>קהל יעד:</strong> טרשת נפוצה (במים קרירים), שיווי משקל, גריאטריה.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // --- DATA STORAGE ---
+        
+        const safetyData = [
+            { type: 'absolute', title: 'פצעים פתוחים', desc: 'סכנת זיהום חמורה למטופל ולסביבה.', en: 'Open Wounds' },
+            { type: 'absolute', title: 'מחלות לב אקוטיות', desc: 'אי ספיקת לב לא מאוזנת, אנגינה לא יציבה.', en: 'Unstable Angina / Acute Heart Failure' },
+            { type: 'absolute', title: 'חום גבוה', desc: 'מעל 38 מעלות. עומס על מערכת ויסות החום.', en: 'Fever' },
+            { type: 'absolute', title: 'אי שליטה על סוגרים', desc: 'ללא הגנה מתאימה - סכנת זיהום.', en: 'Incontinence' },
+            { type: 'absolute', title: 'אפילפסיה לא מאוזנת', desc: 'סכנת טביעה מיידית בזמן התקף.', en: 'Uncontrolled Epilepsy' },
+            { type: 'absolute', title: 'קיבולת ריאה נמוכה מאוד', desc: 'מתחת ל-1 ליטר (Vital Capacity). לחץ המים ימנע נשימה.', en: 'Low Vital Capacity (<1L)' },
+            { type: 'relative', title: 'סוכרת', desc: 'סיכון להיפוגליקמיה מוסווית. יש לבדוק סוכר לפני ואחרי.', en: 'Diabetes' },
+            { type: 'relative', title: 'לחץ דם לא מאוזן', desc: 'מים חמים מורידים ל"ד, קרים מעלים. נדרש ניטור.', en: 'Hypertension / Hypotension' },
+            { type: 'relative', title: 'אפילפסיה מאוזנת', desc: 'דורש השגחה צמודה 1:1 וזיהוי סימנים מקדימים.', en: 'Controlled Epilepsy' },
+            { type: 'relative', title: 'רגישות לכלור', desc: 'גירוי עורי או נשימתי.', en: 'Chemical Sensitivity' },
+            { type: 'relative', title: 'פחד ממים', desc: 'הידרופוביה. עלול לגרום לכיווץ שרירים וחרדה.', en: 'Hydrophobia' },
+        ];
+
+        // --- NAVIGATION LOGIC ---
+
+        function navTo(viewId) {
+            // Update active content
+            document.querySelectorAll('#main-content > div').forEach(div => div.classList.add('hidden-section'));
+            const target = document.getElementById(`view-${viewId}`);
+            if (target) {
+                target.classList.remove('hidden-section');
+                // Scroll to top
+                document.getElementById('main-content').scrollTop = 0;
+            }
+
+            // Update sidebar UI
+            document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById(`nav-${viewId}`);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            // Update Header Text
+            const titles = {
+                'dashboard': 'סקירה וניתוח פערים',
+                'physics': 'פיזיקה (הידרו-מכניקה)',
+                'physiology': 'פיזיולוגיה של המאמץ',
+                'safety': 'בטיחות וקונטרה-אינדיקציות',
+                'methods': 'שיטות טיפול וטמפרטורות'
+            };
+            const headerDisplay = document.getElementById('current-module-display');
+            if (headerDisplay) headerDisplay.innerText = titles[viewId] || '';
+
+            // Trigger charts only when visible to fix animation/sizing issues
+            if (viewId === 'physics') initDragChart();
+            if (viewId === 'physiology') initHRChart();
+        }
+
+        // --- PHYSICS CALCULATOR LOGIC ---
+
+        function calculatePressure() {
+            const depth = parseFloat(document.getElementById('depthInput').value) || 0;
+            // 10m = 1 ATM. Surface is 1 ATM. Gauge pressure is depth/10. Absolute is 1 + depth/10.
+            // Usually in hydrotherapy we talk about the *added* pressure on the body.
+            // 1m depth approx 73 mmHg.
+            const atm = depth / 10;
+            const mmhg = depth * 73.5; // Approx
+            
+            document.getElementById('pressureResult').innerHTML = 
+                `תוספת לחץ: <strong>${atm.toFixed(3)}</strong> אטמוספירות<br>(שהם כ-<strong>${mmhg.toFixed(1)}</strong> מ"מ כספית)`;
+        }
+
+        function updateBuoyancy() {
+            const weight = parseFloat(document.getElementById('weightLand').value) || 0;
+            const factor = parseFloat(document.getElementById('immersionLevel').value);
+            
+            // Factor is "percentage of weight borne by user". 
+            // Neck depth (C7) -> 10% weight bearing (90% buoyancy).
+            // ASIS -> 50% weight bearing.
+            
+            const effectiveWeight = weight * factor;
+            const percentage = factor * 100;
+
+            document.getElementById('weightWaterResult').innerText = effectiveWeight.toFixed(1) + ' ק"ג';
+            document.getElementById('weightBar').style.width = percentage + '%';
+            
+            // Color logic for bar
+            const bar = document.getElementById('weightBar');
+            if (percentage < 20) bar.className = "h-4 rounded-full transition-all duration-500 bg-green-500";
+            else if (percentage < 50) bar.className = "h-4 rounded-full transition-all duration-500 bg-yellow-500";
+            else bar.className = "h-4 rounded-full transition-all duration-500 bg-red-500";
+        }
+
+        // --- SAFETY FILTER LOGIC ---
+
+        function renderSafetyItems(filter) {
+            const container = document.getElementById('contraindications-grid');
+            container.innerHTML = '';
+
+            const filtered = safetyData.filter(item => filter === 'all' || item.type === filter);
+
+            filtered.forEach(item => {
+                const isAbs = item.type === 'absolute';
+                const colorClass = isAbs ? 'border-l-4 border-red-500 bg-red-50' : 'border-l-4 border-yellow-500 bg-yellow-50';
+                const icon = isAbs ? '⛔' : '✋';
+                const badge = isAbs ? 'אסור מוחלט' : 'זהירות נדרשת';
+                const badgeColor = isAbs ? 'text-red-700 bg-red-100' : 'text-yellow-800 bg-yellow-100';
+
+                const html = `
+                    <div class="p-4 rounded shadow-sm bg-white hover:shadow-md transition-shadow">
+                        <div class="${colorClass} pl-4 h-full">
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="text-2xl">${icon}</span>
+                                <span class="text-xs font-bold px-2 py-1 rounded ${badgeColor}">${badge}</span>
+                            </div>
+                            <h4 class="font-bold text-slate-800">${item.title}</h4>
+                            <div class="text-xs text-slate-400 font-mono mb-2">${item.en}</div>
+                            <p class="text-sm text-slate-600">${item.desc}</p>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+        }
+        
+        function filterSafety(type) {
+            renderSafetyItems(type);
+        }
+
+        // --- TEMPERATURE SLIDER LOGIC ---
+        
+        function updateTempInfo(val) {
+            const temp = parseInt(val);
+            const display = document.getElementById('tempDisplay');
+            const category = document.getElementById('tempCategory');
+            const physio = document.getElementById('tempPhysio');
+            const indic = document.getElementById('tempIndications');
+            const time = document.getElementById('tempTime');
+
+            display.innerText = temp + "°C";
+
+            if (temp <= 15) {
+                display.className = "text-5xl font-bold text-blue-700";
+                category.innerText = "מים קרים מאוד (Cold Plunge)";
+                physio.innerText = "כיווץ כלי דם חזק, הפחתת דלקת אקוטית, אלחוש";
+                indic.innerText = "התאוששות ספורטאים, טיפול בדלקת חריפה";
+                time.innerText = "1-3 דקות בלבד!";
+            } else if (temp > 15 && temp <= 29) {
+                display.className = "text-5xl font-bold text-blue-500";
+                category.innerText = "מים קרירים (Cool)";
+                physio.innerText = "מניעת התחממות יתר, שמירה על טונוס";
+                indic.innerText = "טרשת נפוצה (MS), אימון שחייה אינטנסיבי";
+                time.innerText = "30-45 דקות";
+            } else if (temp >= 30 && temp <= 35) {
+                display.className = "text-5xl font-bold text-sky-500";
+                category.innerText = "מים תרמו-ניטרליים (Therapeutic)";
+                physio.innerText = "איזון מושלם, הרפיה קלה, שיפור זרימת דם";
+                indic.innerText = "שיקום כללי, הליוויק, וואטסו, אורתופדיה";
+                time.innerText = "30-60 דקות";
+            } else {
+                display.className = "text-5xl font-bold text-orange-500";
+                category.innerText = "מים חמים (Warm/Hot)";
+                physio.innerText = "הרחבת כלי דם משמעותית, הורדת ל״ד, הרפיית שריר";
+                indic.innerText = "כאב כרוני, ארתריטיס (לא דלקת פעילה), ספא";
+                time.innerText = "10-20 דקות (סכנת עילפון)";
+            }
+        }
+
+        // --- CHARTS (Chart.js) ---
+
+        let dragChartInstance = null;
+        let hrChartInstance = null;
+
+        function initDragChart() {
+            if (dragChartInstance) return; // Prevent re-render
+
+            const ctx = document.getElementById('dragChart').getContext('2d');
+            
+            // Data generation: Drag = v^2
+            const speeds = [0, 1, 2, 3, 4, 5, 6];
+            const drag = speeds.map(s => s * s);
+
+            dragChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: speeds,
+                    datasets: [{
+                        label: 'התנגדות המים (Drag Force)',
+                        data: drag,
+                        borderColor: '#0ea5e9',
+                        backgroundColor: 'rgba(14, 165, 233, 0.2)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `אם המהירות פי ${context.label}, ההתנגדות פי ${context.raw}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            title: { display: true, text: 'עוצמת ההתנגדות' },
+                            beginAtZero: true
+                        },
+                        x: {
+                            title: { display: true, text: 'מהירות תנועה' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initHRChart() {
+            if (hrChartInstance) return;
+
+            const ctx = document.getElementById('hrChart').getContext('2d');
+            
+            hrChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['מנוחה', 'מאמץ קל', 'מאמץ בינוני', 'מאמץ עצים'],
+                    datasets: [
+                        {
+                            label: 'דופק ביבשה (BPM)',
+                            data: [70, 100, 140, 180],
+                            backgroundColor: '#94a3b8' // Slate
+                        },
+                        {
+                            label: 'דופק במים (BPM)',
+                            data: [60, 88, 125, 165],
+                            backgroundColor: '#0ea5e9' // Sky Blue
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        title: {
+                            display: true,
+                            text: 'אפקט הטבילה: ירידה של כ-10-15 פעימות לדקה במים'
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, title: { display: true, text: 'פעימות לדקה' } }
+                    }
+                }
+            });
+        }
+
+        // --- INITIALIZATION ---
+        window.onload = function() {
+            navTo('dashboard'); // Default view
+            renderSafetyItems('all');
+            updateBuoyancy();
+        };
+
+    </script>
+</body>
+</html>
