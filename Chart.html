@@ -1,0 +1,393 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frequency of Citations in AI Search</title>
+    <style>
+        :root {
+            --track-color: #E5E7EB; /* Light grey track */
+            --text-main: #111827;
+            --text-muted: #6B7280;
+            --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-stack);
+            background-color: #FFFFFF;
+            color: var(--text-main);
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 40px;
+            text-align: left;
+            letter-spacing: -0.02em;
+        }
+
+        /* Chart Grid Layout */
+        .chart-grid {
+            display: grid;
+            /* Column 1: Labels (Auto width), Column 2: Bar Area (Flex) */
+            grid-template-columns: 200px 1fr;
+            gap: 15px;
+            align-items: center;
+        }
+
+        /* Top Axis */
+        .axis-spacer {
+            /* Empty space above labels */
+        }
+        
+        .axis-container {
+            position: relative;
+            height: 30px;
+            width: 100%;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 10px;
+        }
+
+        .axis-tick {
+            position: absolute;
+            bottom: 0;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        
+        .axis-tick::after {
+            content: '';
+            position: absolute;
+            bottom: -5px; /* Visual tick mark */
+            left: 50%;
+            width: 1px;
+            height: 5px;
+            background-color: #ddd;
+        }
+
+        /* Data Rows */
+        .label-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%; /* Circular icons */
+            object-fit: contain;
+            /* Fallback background for transparent PNGs */
+            background-color: #f9f9f9; 
+        }
+
+        .brand-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .bar-area {
+            position: relative;
+            width: 100%;
+            height: 32px;
+            display: flex;
+            align-items: center;
+        }
+
+        .bar-track {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: var(--track-color);
+            border-radius: 4px;
+            z-index: 1;
+        }
+
+        .bar-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 2;
+            border-top-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+            /* Smooth animation on load */
+            width: 0; 
+            animation: growBar 1s ease-out forwards;
+        }
+
+        .value-label {
+            position: absolute;
+            z-index: 3;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+            /* Position slightly right of the bar end */
+            transform: translateX(100%); 
+            padding-left: 8px;
+        }
+
+        @keyframes growBar {
+            to { width: var(--target-width); }
+        }
+
+        /* Mobile adjustment */
+        @media (max-width: 600px) {
+            .chart-grid {
+                grid-template-columns: 140px 1fr;
+            }
+            .brand-name {
+                font-size: 13px;
+            }
+            h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Frequency of Citations in AI-Generated Search Results</h1>
+
+    <div class="chart-grid">
+        <div class="axis-spacer"></div>
+        <div class="axis-container">
+            <div class="axis-tick" style="left: 10%">10%</div>
+            <div class="axis-tick" style="left: 20%">20%</div>
+            <div class="axis-tick" style="left: 30%">30%</div>
+            <div class="axis-tick" style="left: 40%">40%</div>
+            <div class="axis-tick" style="left: 50%">50%</div>
+            <div class="axis-tick" style="left: 60%">60%</div>
+            <div class="axis-tick" style="left: 70%">70%</div>
+            <div class="axis-tick" style="left: 80%">80%</div>
+            <div class="axis-tick" style="left: 90%">90%</div>
+            <div class="axis-tick" style="left: 100%">100%</div>
+        </div>
+
+        <div class="label-group">
+            <img src="https://www.google.com/s2/favicons?domain=reddit.com&sz=64" class="brand-logo" alt="Reddit">
+            <span class="brand-name">Reddit</span>
+        </div>
+        <div class="bar-area">
+            <div class="bar-track"></div>
+            <div class="bar-fill" style="background-color: #FF4500; --target-width: 40.11%;"></div>
+            <span class="value-label" style="left: 40.11%">40.11%</span>
+        </div>
+
+        <div class="label-group">
+            <img src="https://www.google.com/s2/favicons?domain=wikipedia.org&sz=64" class="brand-logo" alt="Wikipedia">
+            <span class="brand-name">Wikipedia</span>
+        </div>
+        <div class="bar-area">
+            <div class="bar-track"></div>
+            <div class="bar-fill" style="background-color: #636466; --target-width: 26.33%;"></div>
+            <span class="value-label" style="left: 26.33%">26.33%</span>
+        </div>
+
+        <div class="label-group">
+            <img src="https://www.google.com/s2/favicons?domain=youtube.com&sz=64" class="brand-logo" alt="YouTube">
+            <span class="brand-name">YouTube</span>
+        </div>
+        <div class="bar-area">
+            <div class="bar-track"></div>
+            <div class="bar-fill" style="background-color: #FF0000; --target-width: 23.52%;"></div>
+            <span class="value-label" style="left: 23.52%">23.52%</span>
+        </div>
+
+        <div class="label-group">
+            <img src="https://www.google.com/s2/favicons?domain=google.com&sz=64" class="brand-logo" alt="Google">
+            <span class="brand-name">Google</span>
+        </div>
+        <div class="bar-area">
+            <div class="bar-track"></div>
+            <div class="bar-fill" style="background-color: #4285F4; --target-width: 23.28%;"></div>
+            <span class="value-label" style="left: 23.28%">23.28%</span>
+        </div>
+
+        <div class="label-group">
+            <img src="https://www.google.com/s2/favicons?domain=yelp.com&sz=64" class="brand-logo" alt="Yelp">
+            <span class="brand-name">Yelp</span>
+        </div>
+        <div class="bar-area">
+            <div class="bar-track"></div>
+            <div class="bar-fill" style="background-color: #D32323; --target-width: 21.01%;"></div>
+            <span class="value-label" style="left: 21.01%">21.01%</span>
+        </div>
+
+        <div class="label-group">
+            <img src="https://www.google.com/s2/favicons?domain=facebook.com&sz=64" class="brand-logo" alt="Facebook">
+            <span class="brand-name">Facebook</span>
+        </div>
+        <div class="bar-area">
+            <div class="bar-track"></div>
+            <div class="bar-fill" style="background-color: #1877F2; --target-width: 19.96%;"></div>
+            <span class="value-label" style="left: 19.96%">19.96%</span>
+        </div>
+
+        <div class="label-group">
+            <img src="https://www.google.com/s2/favicons?domain=amazon.com&sz=64" class="brand-logo" alt="Amazon">
+            <span class="brand-name">Amazon</span>
+        </div>
+        <div class="bar-area">
+            <div class="bar-track"></div>
+            <div class="bar-fill" style="background-color: #FF9900; --target-width: 18.72%;"></div>
+            <span class="value-label" style="left: 18.72%">18.72%</span>
+        </div>
+
+        <div class="label-group">
+            <img src="https://www.google.com/s2/favicons?domain=tripadvisor.com&sz=64" class="brand-logo" alt="Tripadvisor">
+            <span class="brand-name">Tripadvisor</span>
+        </div>
+        <div class="bar-area">
+            <div class="bar-track"></div>
+            <div class="bar-fill" style="background-color: #00AF87; --target-width: 12.46%;"></div>
+            <span class="value-label" style="left: 12.46%">12.46%</span>
+        </div>
+
+        <div class="label-group">
+            <img src="https://www.google.com/s2/favicons?domain=mapbox.com&sz=64" class="brand-logo" alt="Mapbox">
+            <span class="brand-name">Mapbox</span>
+        </div>
+        <div class="bar-area">
+            <div class="bar-track"></div>
+            <div class="bar-fill" style="background-color: #4264FB; --target-width: 11.29%;"></div>
+            <span class="value-label" style="left: 11.29%">11.29%</span>
+        </div>
+
+        <div class="label-group">
+            <img src="https://www.google.com/s2/favicons?domain=openstreetmap.org&sz=64" class="brand-logo" alt="OpenStreetMap">
+            <span class="brand-name">OpenStreetMap</span>
+        </div>
+        <div class="bar-area">
+            <div class="bar-track"></div>
+            <div class="bar-fill" style="background-color: #79C83D; --target-width: 11.29%;"></div>
+            <span class="value-label" style="left: 11.29%">11.29%</span>
+        </div>
+
+        <div class="label-group">
+            <img src="https://www.google.com/s2/favicons?domain=instagram.com&sz=64" class="brand-logo" alt="Instagram">
+            <span class="brand-name">Instagram</span>
+        </div>
+        <div class="bar-area">
+            <div class="bar-track"></div>
+            <div class="bar-fill" style="background-color: #E1306C; --target-width: 10.89%;"></div>
+            <span class="value-label" style="left: 10.89%">10.89%</span>
+        </div>
+
+        <div class="label-group">
+            <img src="https://www.google.com/s2/favicons?domain=mapquest.com&sz=64" class="brand-logo" alt="MapQuest">
+            <span class="brand-name">MapQuest</span>
+        </div>
+        <div class="bar-area">
+            <div class="bar-track"></div>
+            <div class="bar-fill" style="background-color: #A5CC45; --target-width: 9.76%;"></div>
+            <span class="value-label" style="left: 9.76%">9.76%</span>
+        </div>
+
+        <div class="label-group">
+            <img src="https://www.google.com/s2/favicons?domain=walmart.com&sz=64" class="brand-logo" alt="Walmart">
+            <span class="brand-name">Walmart</span>
+        </div>
+        <div class="bar-area">
+            <div class="bar-track"></div>
+            <div class="bar-fill" style="background-color: #FFC220; --target-width: 9.32%;"></div>
+            <span class="value-label" style="left: 9.32%">9.32%</span>
+        </div>
+
+        <div class="label-group">
+            <img src="https://www.google.com/s2/favicons?domain=ebay.com&sz=64" class="brand-logo" alt="eBay">
+            <span class="brand-name">eBay</span>
+        </div>
+        <div class="bar-area">
+            <div class="bar-track"></div>
+            <div class="bar-fill" style="background-color: #0064D2; --target-width: 7.74%;"></div>
+            <span class="value-label" style="left: 7.74%">7.74%</span>
+        </div>
+
+        <div class="label-group">
+            <img src="https://www.google.com/s2/favicons?domain=linkedin.com&sz=64" class="brand-logo" alt="LinkedIn">
+            <span class="brand-name">LinkedIn</span>
+        </div>
+        <div class="bar-area">
+            <div class="bar-track"></div>
+            <div class="bar-fill" style="background-color: #0A66C2; --target-width: 5.90%;"></div>
+            <span class="value-label" style="left: 5.90%">5.90%</span>
+        </div>
+
+         <div class="label-group">
+            <img src="https://www.google.com/s2/favicons?domain=quora.com&sz=64" class="brand-logo" alt="Quora">
+            <span class="brand-name">Quora</span>
+        </div>
+        <div class="bar-area">
+            <div class="bar-track"></div>
+            <div class="bar-fill" style="background-color: #B92B27; --target-width: 4.60%;"></div>
+            <span class="value-label" style="left: 4.60%">4.60%</span>
+        </div>
+
+        <div class="label-group">
+            <img src="https://www.google.com/s2/favicons?domain=homedepot.com&sz=64" class="brand-logo" alt="Home Depot">
+            <span class="brand-name">Home Depot</span>
+        </div>
+        <div class="bar-area">
+            <div class="bar-track"></div>
+            <div class="bar-fill" style="background-color: #F96302; --target-width: 4.56%;"></div>
+            <span class="value-label" style="left: 4.56%">4.56%</span>
+        </div>
+
+         <div class="label-group">
+            <img src="https://www.google.com/s2/favicons?domain=yahoo.com&sz=64" class="brand-logo" alt="Yahoo">
+            <span class="brand-name">Yahoo</span>
+        </div>
+        <div class="bar-area">
+            <div class="bar-track"></div>
+            <div class="bar-fill" style="background-color: #6001D2; --target-width: 4.40%;"></div>
+            <span class="value-label" style="left: 4.40%">4.40%</span>
+        </div>
+
+         <div class="label-group">
+            <img src="https://www.google.com/s2/favicons?domain=target.com&sz=64" class="brand-logo" alt="Target">
+            <span class="brand-name">Target</span>
+        </div>
+        <div class="bar-area">
+            <div class="bar-track"></div>
+            <div class="bar-fill" style="background-color: #CC0000; --target-width: 4.33%;"></div>
+            <span class="value-label" style="left: 4.33%">4.33%</span>
+        </div>
+
+         <div class="label-group">
+            <img src="https://www.google.com/s2/favicons?domain=pinterest.com&sz=64" class="brand-logo" alt="Pinterest">
+            <span class="brand-name">Pinterest</span>
+        </div>
+        <div class="bar-area">
+            <div class="bar-track"></div>
+            <div class="bar-fill" style="background-color: #E60023; --target-width: 4.22%;"></div>
+            <span class="value-label" style="left: 4.22%">4.22%</span>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+
+ 
