@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { DynamicRenderer } from '../components/DynamicRenderer';
 import { LessonData } from '../types';
-import { Loader2, Settings } from 'lucide-react';
+import { Loader2, Settings, Menu, X } from 'lucide-react';
 
 export const LessonViewer: React.FC = () => {
   const [lessonData, setLessonData] = useState<LessonData | null>(null);
   const [activeSection, setActiveSection] = useState<string>('intro');
   const [loading, setLoading] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     // Use import.meta.env.BASE_URL to handle deployment on subpaths (e.g. GitHub Pages)
@@ -45,10 +46,40 @@ export const LessonViewer: React.FC = () => {
   const currentSection = lessonData.sections.find(s => s.id === activeSection) || lessonData.sections[0];
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row font-sans" dir="rtl">
+    <div className="min-h-screen flex flex-col md:flex-row font-sans relative" dir="rtl">
+
+      {/* Mobile Header */}
+      <div className="md:hidden bg-white border-b border-gray-200 p-4 sticky top-0 z-30 flex items-center justify-between">
+         <button
+           onClick={() => setIsSidebarOpen(true)}
+           className="p-2 text-slate-600 hover:bg-slate-50 rounded-lg"
+         >
+            <Menu size={24} />
+         </button>
+
+         <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-gradient-to-br from-sky-500 to-blue-600 rounded-lg flex items-center justify-center text-white text-sm font-bold">🌊</div>
+            <span className="font-black text-slate-800">HydroLearning</span>
+         </div>
+
+         <Link to="/admin" className="p-2 text-slate-400 hover:text-sky-600">
+             <Settings size={20} />
+         </Link>
+      </div>
+
+      {/* Overlay for mobile sidebar */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 md:hidden animate-fade-in"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
 
       {/* Sidebar Navigation */}
-      <aside className="w-full md:w-80 bg-white border-l border-gray-200 flex-shrink-0 z-20 md:h-screen md:sticky md:top-0 overflow-y-auto">
+      <aside className={`
+        fixed inset-y-0 right-0 w-80 bg-white border-l border-gray-200 z-50 transform transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:h-screen md:sticky md:top-0 overflow-y-auto
+        ${isSidebarOpen ? 'translate-x-0' : 'translate-x-full'}
+      `}>
         <div className="p-6 border-b md:border-b-0">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
@@ -59,9 +90,19 @@ export const LessonViewer: React.FC = () => {
               </div>
             </div>
 
-            <Link to="/admin" className="p-2 text-slate-400 hover:text-sky-600 transition-colors" title="ניהול מערכת">
-               <Settings size={20} />
-            </Link>
+            <div className="flex items-center gap-2">
+               <Link to="/admin" className="p-2 text-slate-400 hover:text-sky-600 transition-colors hidden md:block" title="ניהול מערכת">
+                  <Settings size={20} />
+               </Link>
+
+               {/* Close button for mobile */}
+               <button
+                 onClick={() => setIsSidebarOpen(false)}
+                 className="md:hidden p-2 text-slate-400 hover:text-red-500"
+               >
+                 <X size={20} />
+               </button>
+            </div>
           </div>
 
           <nav className="space-y-2">
@@ -70,6 +111,7 @@ export const LessonViewer: React.FC = () => {
                 key={section.id}
                 onClick={() => {
                    setActiveSection(section.id);
+                   setIsSidebarOpen(false); // Close sidebar on selection (mobile)
                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
                 className={`w-full text-right px-4 py-3 rounded-lg flex items-center gap-3 transition-all ${
@@ -86,11 +128,11 @@ export const LessonViewer: React.FC = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 bg-slate-50 relative">
+      <main className="flex-1 bg-slate-50 relative w-full">
         <div className="max-w-4xl mx-auto p-5 md:p-12 pb-24">
 
-          {/* Header for Mobile/Desktop */}
-          <header className="mb-10 pb-4 border-b border-gray-200">
+          {/* Header for Desktop (hidden on mobile since we have the sticky header) */}
+          <header className="mb-10 pb-4 border-b border-gray-200 hidden md:block">
              <div className="flex items-center justify-between">
                 <div>
                    <h2 className="text-3xl md:text-4xl font-black text-slate-800 mb-3">{currentSection.title}</h2>
@@ -98,6 +140,12 @@ export const LessonViewer: React.FC = () => {
                 </div>
              </div>
           </header>
+
+          {/* Mobile Title (since we hid the big header) */}
+          <div className="md:hidden mb-6">
+              <h2 className="text-2xl font-black text-slate-800 mb-2">{currentSection.title}</h2>
+              <p className="text-sm text-slate-500">{lessonData.description}</p>
+          </div>
 
           {/* Dynamic Engine */}
           <DynamicRenderer components={currentSection.components} />
