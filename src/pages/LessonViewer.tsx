@@ -1,95 +1,87 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
 import { DynamicRenderer } from '../components/DynamicRenderer';
-import { LessonData } from '../types';
-import { Loader2, Settings } from 'lucide-react';
+import { Loader2, AlertCircle } from 'lucide-react';
+import { useLessonStore } from '../store/useLessonStore';
+import { fetchLessonData } from '../services/lessonService';
+import { Layout } from '../components/layout/Layout';
 
 export const LessonViewer: React.FC = () => {
-  const [lessonData, setLessonData] = useState<LessonData | null>(null);
-  const [activeSection, setActiveSection] = useState<string>('intro');
-  const [loading, setLoading] = useState(true);
+  const {
+    lessonData,
+    activeSectionId,
+    isLoading,
+    error,
+    setLessonData,
+    setActiveSectionId,
+    setLoading,
+    setError
+  } = useLessonStore();
 
   useEffect(() => {
-    // Use import.meta.env.BASE_URL to handle deployment on subpaths (e.g. GitHub Pages)
-    const baseUrl = import.meta.env.BASE_URL.endsWith('/')
-      ? import.meta.env.BASE_URL
-      : import.meta.env.BASE_URL + '/';
+    const loadData = async () => {
+      // Avoid reloading if we already have data (unless we want to force refresh)
+      // For now, let's load if empty.
+      if (lessonData) return;
 
-    fetch(`${baseUrl}data/lesson-01.json`)
-      .then(res => res.json())
-      .then(data => {
+      setLoading(true);
+      try {
+        const data = await fetchLessonData();
         setLessonData(data);
-        if (data.sections.length > 0) {
-          setActiveSection(data.sections[0].id);
+        // Set initial section if not set
+        if (data.sections.length > 0 && !activeSectionId) {
+          setActiveSectionId(data.sections[0].id);
         }
+      } catch (err: any) {
+        setError(err.message || "Failed to load lesson");
+      } finally {
         setLoading(false);
-      })
-      .catch(err => {
-        console.error("Failed to load lesson data", err);
-        setLoading(false);
-      });
-  }, []);
+      }
+    };
 
-  if (loading) {
+    loadData();
+  }, [lessonData, activeSectionId, setLessonData, setActiveSectionId, setLoading, setError]);
+
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-slate-50">
-        <Loader2 className="w-10 h-10 animate-spin text-sky-600" />
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-10 h-10 animate-spin text-sky-600" />
+          <p className="text-slate-500 font-medium">טוען שיעור...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-slate-50 p-4">
+        <div className="bg-white p-8 rounded-2xl shadow-xl text-center max-w-md w-full border-t-4 border-red-500">
+           <div className="bg-red-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500">
+              <AlertCircle size={32} />
+           </div>
+           <h2 className="text-xl font-bold text-slate-800 mb-2">שגיאה בטעינת השיעור</h2>
+           <p className="text-slate-600 mb-6">{error}</p>
+           <button
+             onClick={() => window.location.reload()}
+             className="px-6 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition w-full"
+           >
+             נסה שוב
+           </button>
+        </div>
       </div>
     );
   }
 
   if (!lessonData) {
-    return <div className="p-10 text-center text-red-500">שגיאה בטעינת הנתונים. אנא נסה לרענן.</div>;
+    return null; // Should not happen given loading/error states
   }
 
-  const currentSection = lessonData.sections.find(s => s.id === activeSection) || lessonData.sections[0];
+  const currentSection = lessonData.sections.find(s => s.id === activeSectionId) || lessonData.sections[0];
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row font-sans" dir="rtl">
-
-      {/* Sidebar Navigation */}
-      <aside className="w-full md:w-80 bg-white border-l border-gray-200 flex-shrink-0 z-20 md:h-screen md:sticky md:top-0 overflow-y-auto">
-        <div className="p-6 border-b md:border-b-0">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-sky-500 to-blue-600 rounded-xl flex items-center justify-center text-white text-xl shadow-lg shadow-sky-100">🌊</div>
-              <div>
-                <h1 className="text-xl font-black text-slate-800 tracking-tight leading-none">HydroLearning</h1>
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">המדריך המקצועי</p>
-              </div>
-            </div>
-
-            <Link to="/admin" className="p-2 text-slate-400 hover:text-sky-600 transition-colors" title="ניהול מערכת">
-               <Settings size={20} />
-            </Link>
-          </div>
-
-          <nav className="space-y-2">
-            {lessonData.sections.map((section) => (
-              <button
-                key={section.id}
-                onClick={() => {
-                   setActiveSection(section.id);
-                   window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
-                className={`w-full text-right px-4 py-3 rounded-lg flex items-center gap-3 transition-all ${
-                  activeSection === section.id
-                    ? 'bg-sky-50 text-sky-700 font-bold border-r-4 border-sky-500'
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-sky-600 border-r-4 border-transparent'
-                }`}
-              >
-                <span>{section.title}</span>
-              </button>
-            ))}
-          </nav>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 bg-slate-50 relative">
-        <div className="max-w-4xl mx-auto p-5 md:p-12 pb-24">
-
-          {/* Header for Mobile/Desktop */}
+    <Layout>
+      <div className="max-w-4xl mx-auto p-5 md:p-12 pb-24">
+          {/* Section Header */}
           <header className="mb-10 pb-4 border-b border-gray-200">
              <div className="flex items-center justify-between">
                 <div>
@@ -105,7 +97,7 @@ export const LessonViewer: React.FC = () => {
           {/* Navigation Footer */}
           <div className="mt-16 pt-8 border-t border-slate-200 flex justify-between">
              {(() => {
-                const currentIndex = lessonData.sections.findIndex(s => s.id === activeSection);
+                const currentIndex = lessonData.sections.findIndex(s => s.id === activeSectionId);
                 const prev = lessonData.sections[currentIndex - 1];
                 const next = lessonData.sections[currentIndex + 1];
 
@@ -115,13 +107,14 @@ export const LessonViewer: React.FC = () => {
                       {prev && (
                         <button
                           onClick={() => {
-                            setActiveSection(prev.id);
+                            setActiveSectionId(prev.id);
                             window.scrollTo({ top: 0, behavior: 'smooth' });
                           }}
                           className="flex items-center gap-2 px-6 py-3 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold transition"
                         >
                           <span>→</span>
-                          <span>{prev.title}</span>
+                          <span className="hidden md:inline">{prev.title}</span>
+                          <span className="md:hidden">הקודם</span>
                         </button>
                       )}
                     </div>
@@ -129,12 +122,13 @@ export const LessonViewer: React.FC = () => {
                       {next && (
                         <button
                           onClick={() => {
-                             setActiveSection(next.id);
+                             setActiveSectionId(next.id);
                              window.scrollTo({ top: 0, behavior: 'smooth' });
                           }}
                           className="flex items-center gap-2 px-6 py-3 rounded-xl bg-sky-600 text-white shadow-md shadow-sky-200 hover:bg-sky-700 font-bold transition"
                         >
-                          <span>{next.title}</span>
+                          <span className="hidden md:inline">{next.title}</span>
+                          <span className="md:hidden">הבא</span>
                           <span>←</span>
                         </button>
                       )}
@@ -143,9 +137,7 @@ export const LessonViewer: React.FC = () => {
                 );
              })()}
           </div>
-
-        </div>
-      </main>
-    </div>
+      </div>
+    </Layout>
   );
-}
+};
