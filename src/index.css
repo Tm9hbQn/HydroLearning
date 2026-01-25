@@ -2,8 +2,44 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  body {
-    @apply bg-slate-50 text-slate-900;
-  }
+@layer utilities {
+  .animate-flow-up { animation: flow-up 2s ease-in-out infinite; }
+  .animate-bounce-slight { animation: bounce-slight 2s ease-in-out infinite; }
+  .animate-squeeze-right-harmonious { animation: squeeze-right-harmonious 2s ease-in-out infinite; }
+  .animate-squeeze-left-harmonious { animation: squeeze-left-harmonious 2s ease-in-out infinite; }
+  .animate-flow-in-left { animation: flow-in-left 1.5s linear infinite; }
+  .animate-flow-in-right { animation: flow-in-right 1.5s linear infinite; }
+}
+
+@keyframes dash {
+  to { stroke-dashoffset: -10; }
+}
+@keyframes flow-up {
+   0% { transform: translateY(0); }
+   50% { transform: translateY(-5px); }
+   100% { transform: translateY(0); }
+}
+@keyframes squeeze-right-harmonious {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(5px); }
+    100% { transform: translateX(0); }
+}
+@keyframes squeeze-left-harmonious {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
+}
+@keyframes flow-in-left {
+    0% { transform: translate(0, 0); opacity: 0; }
+    50% { opacity: 1; }
+    100% { transform: translate(8px, 4px); opacity: 0; }
+}
+@keyframes flow-in-right {
+    0% { transform: translate(0, 0); opacity: 0; }
+    50% { opacity: 1; }
+    100% { transform: translate(-8px, 4px); opacity: 0; }
+}
+@keyframes bounce-slight {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
 }
