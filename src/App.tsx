@@ -1,16 +1,17 @@
 import React from 'react';
-import { HashRouter, Routes, Route } from 'react-router-dom';
-import { LessonViewer } from './pages/LessonViewer';
-import { Admin } from './pages/Admin';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Layout } from './layouts/Layout';
+import { Dashboard } from './pages/Dashboard';
 
 function App() {
   return (
-    <HashRouter>
-      <Routes>
-        <Route path="/" element={<LessonViewer />} />
-        <Route path="/admin" element={<Admin />} />
-      </Routes>
-    </HashRouter>
+    <Router>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+        </Routes>
+      </Layout>
+    </Router>
   );
 }
 
