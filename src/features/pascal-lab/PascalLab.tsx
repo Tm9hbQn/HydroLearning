@@ -28,11 +28,11 @@ export const PascalLab = () => {
 
         {/* Controls - Slider Centered */}
         <div className="h-[200px] flex flex-col items-center justify-center bg-slate-50 rounded-xl p-2 border border-slate-200 shadow-inner w-16 shrink-0 relative">
-           <div className="text-[10px] font-bold text-blue-800 mb-2">2m</div>
+           <div className="text-[10px] font-bold text-blue-800 mb-2">2.5m</div>
            <Slider
             vertical
             min={0}
-            max={2}
+            max={2.5}
             step={0.05}
             value={waterLevel}
             onChange={(e) => setWaterLevel(parseFloat(e.target.value))}
@@ -55,8 +55,14 @@ export const PascalLab = () => {
           <div
             className="absolute bottom-0 left-0 right-0 bg-blue-400/30 transition-all duration-100 ease-out border-t border-blue-500 shadow-lg z-10"
             style={{ height: `${(waterLevel / 2.1) * 100}%` }}
+          />
+
+          {/* Water Surface Label - Moved out to be above body */}
+          <div
+            className="absolute right-2 text-[10px] font-bold text-blue-700 bg-white/80 px-1 rounded-b z-30 transition-all duration-100 ease-out"
+            style={{ bottom: `${(waterLevel / 2.1) * 100}%` }}
           >
-             <div className="absolute top-0 right-2 text-[10px] font-bold text-blue-700 bg-white/50 px-1 rounded-b">{t('pascal_lab.water_surface')}</div>
+            {t('pascal_lab.water_surface')}
           </div>
 
           <svg viewBox="0 0 200 400" className="absolute bottom-0 left-1/2 -translate-x-1/2 h-full w-full max-w-[300px] z-20">
