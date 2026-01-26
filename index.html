@@ -5,32 +5,6 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>HydroLearning - המדריך המקצועי</title>
-    <script>
-      // Global Error Trap - Renders errors to the screen if the app fails to start
-      window.onerror = function(message, source, lineno, colno, error) {
-        const errorContainer = document.getElementById('root') || document.body;
-        errorContainer.innerHTML += `
-          <div style="padding: 20px; background: #ffe6e6; border: 1px solid #ff0000; color: #cc0000; margin: 20px; font-family: sans-serif; direction: ltr; text-align: left;">
-            <h2 style="margin-top: 0;">Application Startup Error</h2>
-            <p><strong>Message:</strong> ${message}</p>
-            <p><strong>Source:</strong> ${source}:${lineno}:${colno}</p>
-            <pre style="background: #fff; padding: 10px; overflow: auto;">${error && error.stack ? error.stack : 'No stack trace available'}</pre>
-          </div>
-        `;
-        console.error('Global Error Trap:', message, error);
-      };
-
-      window.onunhandledrejection = function(event) {
-        const errorContainer = document.getElementById('root') || document.body;
-        errorContainer.innerHTML += `
-          <div style="padding: 20px; background: #ffe6e6; border: 1px solid #ff0000; color: #cc0000; margin: 20px; font-family: sans-serif; direction: ltr; text-align: left;">
-            <h2 style="margin-top: 0;">Unhandled Promise Rejection</h2>
-            <p><strong>Reason:</strong> ${event.reason}</p>
-          </div>
-        `;
-        console.error('Global Unhandled Rejection:', event.reason);
-      };
-    </script>
     <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700;800&family=Frank+Ruhl+Libre:wght@500;700&display=swap" rel="stylesheet">
   </head>
   <body>
