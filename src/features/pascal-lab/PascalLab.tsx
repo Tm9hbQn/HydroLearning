@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { ArrowDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card } from '../../components/ui/Card';
@@ -10,12 +10,12 @@ export const PascalLab = () => {
   const RHO = 1000;
   const G = 9.81;
 
-  const landmarks = [
+  const landmarks = useMemo(() => [
     { name: t('pascal_lab.landmarks.ankles'), h: 0.1 },
     { name: t('pascal_lab.landmarks.knees'), h: 0.5 },
     { name: t('pascal_lab.landmarks.pelvis'), h: 0.9 },
     { name: t('pascal_lab.landmarks.chest'), h: 1.4 }
-  ];
+  ], [t]);
 
   return (
     <Card
