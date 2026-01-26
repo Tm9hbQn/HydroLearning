@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, Droplets, RotateCcw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card } from '../../components/ui/Card';
@@ -20,14 +20,14 @@ export const FluidJourney = () => {
       }
   };
 
-  const steps = [
+  const steps = useMemo(() => [
     { title: t('fluid_journey.steps.0.title'), text: t('fluid_journey.steps.0.text') },
     { title: t('fluid_journey.steps.1.title'), text: t('fluid_journey.steps.1.text') },
     { title: t('fluid_journey.steps.2.title'), text: t('fluid_journey.steps.2.text') },
     { title: t('fluid_journey.steps.3.title'), text: t('fluid_journey.steps.3.text') },
     { title: t('fluid_journey.steps.4.title'), text: t('fluid_journey.steps.4.text') },
     { title: t('fluid_journey.steps.5.title'), text: t('fluid_journey.steps.5.text') }
-  ];
+  ], [t]);
 
   const handleNext = () => step < 5 ? setStep(step + 1) : setStep(0);
   const handlePrev = () => step > 0 && setStep(step - 1);
