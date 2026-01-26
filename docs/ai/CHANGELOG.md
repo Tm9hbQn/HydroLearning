@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Fixes
+- **Routing**: Switched from `BrowserRouter` to `HashRouter` to support GitHub Pages subdirectory hosting.
+- **Cleanup**: Removed unused `Chart.html` and `wrangler.json` files.
+
 ## [0.1.0] - 2024-05-23 (Initial Rebuild)
 ### Architecture
 - **Complete Rebuild**: Deleted old `src` and established a Feature-Based Architecture (`src/features/...`).
