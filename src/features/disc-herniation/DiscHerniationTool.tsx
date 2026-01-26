@@ -4,9 +4,11 @@ import { useTranslation } from 'react-i18next';
 import { Card } from '../../components/ui/Card';
 import { cn } from '../../lib/utils';
 
+const STAGES = ['normal', 'degeneration', 'bulge', 'extrusion', 'sequestration'] as const;
+
 export const DiscHerniationTool = () => {
   const { t } = useTranslation();
-  const [stage, setStage] = useState<'normal' | 'degeneration' | 'bulge' | 'extrusion' | 'sequestration'>('normal');
+  const [stage, setStage] = useState<typeof STAGES[number]>('normal');
   const [view, setView] = useState<'top' | 'side'>('top');
 
   const colors = {
@@ -159,7 +161,7 @@ export const DiscHerniationTool = () => {
         </div>
 
         <div className="flex flex-wrap gap-2 justify-center w-full">
-          {(['normal', 'degeneration', 'bulge', 'extrusion', 'sequestration'] as const).map(s => (
+          {STAGES.map(s => (
             <button
                 key={s}
                 onClick={() => setStage(s)}
