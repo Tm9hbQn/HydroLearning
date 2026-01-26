@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 ### Fixes
+- **Deployment Diagnosis**: Identified GitHub Pages "Source" setting as the root cause of blank page/404 issues. Created `docs/ai/deployment_fix.md` with instructions.
+- **Verification**: Verified `public/test.html` and `public/.nojekyll` are correctly included in the build artifact.
+- **Debugging**: Added console version log to `App.tsx` to verify successful deployment.
 - **Restoration**: Reconstructed `index.html` with correct Hebrew configuration (`lang="he"`, `dir="rtl"`), Google Fonts (Assistant, Frank Ruhl Libre), and Vite entry point.
 - **Deployment**: Added `public/.nojekyll` to ensure correct asset serving on GitHub Pages.
 - **Routing**: Switched from `BrowserRouter` to `HashRouter` to support GitHub Pages subdirectory hosting.

@@ -4,6 +4,7 @@ import { Layout } from './layouts/Layout';
 import { Dashboard } from './pages/Dashboard';
 
 function App() {
+  console.log('HydroLearning App Initialized (v2)');
   return (
     <Router>
       <Layout>
