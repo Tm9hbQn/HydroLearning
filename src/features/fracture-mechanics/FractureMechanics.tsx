@@ -80,7 +80,6 @@ export const FractureMechanics = () => {
                     <div style={getFractureStyle()}></div>
                 </div>
                 {/* Force Arrows */}
-                {forceType === 'shear' && <div className="absolute top-1/2 -right-6 text-3xl font-bold text-slate-600">←</div>}
                 {forceType === 'shear' && <div className="absolute top-1/2 -left-6 text-3xl font-bold text-slate-600">→</div>}
                 {forceType === 'torsion' && <div className="absolute -top-6 text-3xl text-slate-600">↻</div>}
                 {forceType === 'torsion' && <div className="absolute -bottom-6 text-3xl text-slate-600">↺</div>}

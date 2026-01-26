@@ -28,11 +28,11 @@ export const PascalLab = () => {
 
         {/* Controls - Slider Centered */}
         <div className="h-[200px] flex flex-col items-center justify-center bg-slate-50 rounded-xl p-2 border border-slate-200 shadow-inner w-16 shrink-0 relative">
-           <div className="text-[10px] font-bold text-blue-800 mb-2">2.5m</div>
+           <div className="text-[10px] font-bold text-blue-800 mb-2">2.0m</div>
            <Slider
             vertical
             min={0}
-            max={2.5}
+            max={2}
             step={0.05}
             value={waterLevel}
             onChange={(e) => setWaterLevel(parseFloat(e.target.value))}
@@ -41,7 +41,7 @@ export const PascalLab = () => {
 
           {/* Moving Label */}
           <div
-            className="absolute right-full mr-2 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded shadow-md pointer-events-none transition-all whitespace-nowrap"
+            className="absolute right-full mr-2 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded shadow-md pointer-events-none transition-all whitespace-nowrap z-50"
             style={{ top: `${100 - (waterLevel/2)*80 - 10}%` }}
           >
              {waterLevel.toFixed(2)}m
@@ -59,7 +59,7 @@ export const PascalLab = () => {
 
           {/* Water Surface Label - Moved out to be above body */}
           <div
-            className="absolute right-2 text-[10px] font-bold text-blue-700 bg-white/80 px-1 rounded-b z-30 transition-all duration-100 ease-out"
+            className="absolute right-2 text-[10px] font-bold text-blue-700 bg-white/80 px-1 rounded-b z-50 transition-all duration-100 ease-out"
             style={{ bottom: `${(waterLevel / 2.1) * 100}%` }}
           >
             {t('pascal_lab.water_surface')}
