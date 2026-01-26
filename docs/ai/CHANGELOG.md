@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 ### Fixes
+- **Restoration**: Reconstructed `index.html` with correct Hebrew configuration (`lang="he"`, `dir="rtl"`), Google Fonts (Assistant, Frank Ruhl Libre), and Vite entry point.
+- **Deployment**: Added `public/.nojekyll` to ensure correct asset serving on GitHub Pages.
 - **Routing**: Switched from `BrowserRouter` to `HashRouter` to support GitHub Pages subdirectory hosting.
 - **Cleanup**: Removed unused `Chart.html` and `wrangler.json` files.
 
