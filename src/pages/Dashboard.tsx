@@ -7,6 +7,7 @@ import { FractureMechanics } from '../features/fracture-mechanics/FractureMechan
 import { FluidJourney } from '../features/fluid-journey/FluidJourney';
 
 export const Dashboard = () => {
+  console.log("Dashboard component rendering...");
   const { t } = useTranslation();
 
   return (

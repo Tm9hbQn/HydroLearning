@@ -29,6 +29,8 @@ ChartJS.register(
   Filler
 );
 
+console.log("Application mounting...");
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ErrorBoundary>

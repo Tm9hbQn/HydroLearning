@@ -9,6 +9,7 @@ function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<Dashboard />} />
+          <Route path="/test" element={<div className="p-8 text-center text-green-600 font-bold text-xl">React Router is Working!</div>} />
         </Routes>
       </Layout>
     </Router>
