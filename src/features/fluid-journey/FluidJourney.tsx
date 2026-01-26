@@ -13,7 +13,7 @@ export const FluidJourney = () => {
           case 0: return "scale(1) translate(0, 0)";
           case 1: return "scale(1) translate(0, 0)";
           case 2: return "scale(1) translate(0, 0)";
-          case 3: return "translate(0px, 50px) scale(3.5)"; // Target Heart (50,50)
+          case 3: return "translate(0px, 50px) scale(2.5)"; // Target Heart (50,50)
           case 4: return "translate(0px, 70px) scale(2)"; // Upper Body
           case 5: return "translate(0px, 0px) scale(1)"; // Reset
           default: return "scale(1) translate(0, 0)";
@@ -81,7 +81,7 @@ export const FluidJourney = () => {
                         </g>
                         <g transform="translate(50, 160)">
                             <rect x="-10" y="-4" width="20" height="6" rx="2" fill="rgba(0,0,0,0.5)" />
-                            <text x="0" y="0" fill="white" fontSize="6" textAnchor="middle" dominantBaseline="middle">{t('fluid_journey.labels.water_pressure')}</text>
+                            <text x="0" y="0" fill="white" fontSize="8" textAnchor="middle" dominantBaseline="middle">{t('fluid_journey.labels.water_pressure')}</text>
                         </g>
                     </g>
                 )}
@@ -94,7 +94,7 @@ export const FluidJourney = () => {
 
                       <g transform="translate(50, 100)">
                          <rect x="-12" y="-4" width="24" height="6" rx="2" fill="rgba(0,0,0,0.5)" />
-                         <text x="0" y="0" fill="white" fontSize="5" textAnchor="middle" dominantBaseline="middle" fontWeight="bold">{t('fluid_journey.labels.blood_rise')}</text>
+                         <text x="0" y="0" fill="white" fontSize="7" textAnchor="middle" dominantBaseline="middle" fontWeight="bold">{t('fluid_journey.labels.blood_rise')}</text>
                       </g>
                    </g>
                 )}
@@ -102,8 +102,9 @@ export const FluidJourney = () => {
                 {/* Step 3: Heart with Veins & Internal Arrows */}
                 <g transform="translate(50,50)">
                     {/* Veins Entering */}
-                    <path d="M-15,10 Q-10,5 -8,5" stroke="#ef4444" strokeWidth="2" fill="none" />
-                    <path d="M15,10 Q10,5 8,5" stroke="#ef4444" strokeWidth="2" fill="none" />
+                    <path d="M-15,10 Q-10,5 -8,5" stroke="#60a5fa" strokeWidth="3" fill="none" markerEnd="url(#blueArrowSmall)" />
+                    <path d="M15,10 Q10,5 8,5" stroke="#60a5fa" strokeWidth="3" fill="none" markerEnd="url(#blueArrowSmall)" />
+                    <text x="0" y="-8" fontSize="6" fill="#60a5fa" textAnchor="middle" fontWeight="bold">ורידים</text>
 
                     {/* Animated Flow into Heart */}
                     {step === 3 && (
@@ -124,11 +125,6 @@ export const FluidJourney = () => {
                             <path d="M-2,5 L-5,5" stroke="white" strokeWidth="0.5" markerEnd="url(#whiteArrowSmall)" />
                             <path d="M2,5 L5,5" stroke="white" strokeWidth="0.5" markerEnd="url(#whiteArrowSmall)" />
 
-                            {/* Label */}
-                            <g transform="translate(0, -6)">
-                               <rect x="-12" y="-3" width="24" height="5" rx="1" fill="rgba(0,0,0,0.6)" />
-                               <text x="0" y="0" fill="white" fontSize="4" textAnchor="middle" dominantBaseline="middle">{t('fluid_journey.labels.blood_in')}</text>
-                            </g>
                         </g>
                     )}
                 </g>
@@ -140,13 +136,13 @@ export const FluidJourney = () => {
 
                       <g transform="translate(68, 16)">
                           <rect x="-8" y="-2" width="16" height="4" rx="1" fill="rgba(255,255,255,0.9)" />
-                          <text x="0" y="0.5" fill="#f87171" fontSize="4" fontWeight="bold" textAnchor="middle">{t('fluid_journey.labels.adh_down')}</text>
+                          <text x="0" y="0.5" fill="#f87171" fontSize="6" fontWeight="bold" textAnchor="middle">{t('fluid_journey.labels.adh_down')}</text>
                       </g>
                       <line x1="50" y1="15" x2="60" y2="16" stroke="white" strokeWidth="0.2" />
 
                       <g transform="translate(68, 51)">
                           <rect x="-8" y="-2" width="16" height="4" rx="1" fill="rgba(255,255,255,0.9)" />
-                          <text x="0" y="0.5" fill="#4ade80" fontSize="4" fontWeight="bold" textAnchor="middle">{t('fluid_journey.labels.anp_up')}</text>
+                          <text x="0" y="0.5" fill="#4ade80" fontSize="6" fontWeight="bold" textAnchor="middle">{t('fluid_journey.labels.anp_up')}</text>
                       </g>
                       <line x1="55" y1="50" x2="60" y2="51" stroke="white" strokeWidth="0.2" />
                    </g>
@@ -160,14 +156,14 @@ export const FluidJourney = () => {
 
                       <g transform="translate(30, 80)">
                           <rect x="-10" y="-2" width="20" height="4" rx="1" fill="rgba(0,0,0,0.6)" />
-                          <text x="0" y="0.5" fill="white" fontSize="4" textAnchor="middle">{t('fluid_journey.labels.kidney_filter')}</text>
+                          <text x="0" y="0.5" fill="white" fontSize="6" textAnchor="middle">{t('fluid_journey.labels.kidney_filter')}</text>
                       </g>
 
                       <path d="M45,100 Q50,115 55,100 Z" fill="#facc15" className="animate-pulse" />
 
                       <g transform="translate(50, 115)">
                           <rect x="-8" y="-2" width="16" height="4" rx="1" fill="rgba(0,0,0,0.6)" />
-                          <text x="0" y="0.5" fill="#facc15" fontSize="4" textAnchor="middle" fontWeight="bold">{t('fluid_journey.labels.diuresis')}</text>
+                          <text x="0" y="0.5" fill="#facc15" fontSize="6" textAnchor="middle" fontWeight="bold">{t('fluid_journey.labels.diuresis')}</text>
                       </g>
 
                       <path d="M40,85 L48,100 M60,85 L52,100" stroke="#facc15" strokeWidth="1" strokeDasharray="1,1" className="animate-[dash_0.5s_linear_infinite]" />
@@ -178,6 +174,7 @@ export const FluidJourney = () => {
 
               <defs>
                   <marker id="redArrowSmall" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto"><path d="M0,0 L4,2 L0,4" fill="#ef4444" /></marker>
+                  <marker id="blueArrowSmall" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto"><path d="M0,0 L4,2 L0,4" fill="#60a5fa" /></marker>
                   <marker id="whiteArrowSmall" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto"><path d="M0,0 L4,2 L0,4" fill="white" /></marker>
               </defs>
            </svg>

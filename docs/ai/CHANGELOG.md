@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 ### Fixes
+- **PascalLab**: Reverted water level gauge maximum to 2 meters. Fixed z-index layering to ensure the current level gauge is always visible on top.
+- **FractureMechanics**: Removed redundant "(0-100)" text from force gauge label. Removed the right-side arrow in "Shear" mode to declutter the visualization.
+- **FluidJourney**: Increased font sizes for better readability. adjusted zoom level for the Heart step (Step 3) to improve focus. Enhanced visualization of venous return to the heart with clearer paths and labels.
 - **Deployment Diagnosis**: Identified GitHub Pages "Source" setting as the root cause of blank page/404 issues. Created `docs/ai/deployment_fix.md` with instructions.
 - **Verification**: Verified `public/test.html` and `public/.nojekyll` are correctly included in the build artifact.
 - **Debugging**: Added console version log to `App.tsx` to verify successful deployment.
