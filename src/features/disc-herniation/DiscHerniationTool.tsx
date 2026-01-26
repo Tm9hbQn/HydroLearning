@@ -4,18 +4,18 @@ import { useTranslation } from 'react-i18next';
 import { Card } from '../../components/ui/Card';
 import { cn } from '../../lib/utils';
 
+const colors = {
+  vertebra: "#e2e8f0",
+  annulus: "#94a3b8",
+  nucleus: "#ef4444",
+  nerve: "#fbbf24",
+  pain: "#facc15"
+};
+
 export const DiscHerniationTool = () => {
   const { t } = useTranslation();
   const [stage, setStage] = useState<'normal' | 'degeneration' | 'bulge' | 'extrusion' | 'sequestration'>('normal');
   const [view, setView] = useState<'top' | 'side'>('top');
-
-  const colors = {
-    vertebra: "#e2e8f0",
-    annulus: "#94a3b8",
-    nucleus: "#ef4444",
-    nerve: "#fbbf24",
-    pain: "#facc15"
-  };
 
   const isPain = stage === 'extrusion' || stage === 'sequestration';
 
