@@ -14,10 +14,10 @@ export const FractureMechanics = () => {
   const getTransform = () => {
     const val = forceVal / 2;
     switch(forceType) {
-      case 'torsion': return `rotateY(${val}deg)`;
+      case 'torsion': return `skewX(${val/2}deg)`;
       case 'compression': return `scaleY(${1 - forceVal/400}) scaleX(${1 + forceVal/600})`;
       case 'tension': return `scaleY(${1 + forceVal/400}) scaleX(${1 - forceVal/600})`;
-      case 'shear': return `skewX(${val/2}deg)`;
+      case 'shear': return `translateX(${val/4}px)`;
       default: return '';
     }
   };
