@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { ArrowDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card } from '../../components/ui/Card';
@@ -10,12 +10,12 @@ export const PascalLab = () => {
   const RHO = 1000;
   const G = 9.81;
 
-  const landmarks = [
+  const landmarks = useMemo(() => [
     { name: t('pascal_lab.landmarks.ankles'), h: 0.1 },
     { name: t('pascal_lab.landmarks.knees'), h: 0.5 },
     { name: t('pascal_lab.landmarks.pelvis'), h: 0.9 },
     { name: t('pascal_lab.landmarks.chest'), h: 1.4 }
-  ];
+  ], [t]);
 
   return (
     <Card
@@ -66,31 +66,34 @@ export const PascalLab = () => {
           </div>
 
           <svg viewBox="0 0 200 400" className="absolute bottom-0 left-1/2 -translate-x-1/2 h-full w-full max-w-[300px] z-20">
-            {/* Body Outline */}
-            <g fill={waterLevel > 0.1 ? "#f1f5f9" : "#ffffff"} stroke="#334155" strokeWidth="2">
-              <path d="M100,50 C115,50 120,65 120,80 L135,100 L130,200 L125,280 L135,380 L100,380 L100,280 L100,380 L65,380 L75,280 L70,200 L65,100 L80,80 C80,65 85,50 100,50 Z" />
-              <circle cx="100" cy="40" r="25" fill="#f1f5f9" stroke="#334155" strokeWidth="2" />
-            </g>
+            {/* Scaled Human Group (1.8m height) */}
+            <g transform="translate(100, 380) scale(1, 0.81) translate(-100, -380)">
+              {/* Body Outline */}
+              <g fill={waterLevel > 0.1 ? "#f1f5f9" : "#ffffff"} stroke="#334155" strokeWidth="2">
+                <path d="M100,50 C115,50 120,65 120,80 L135,100 L130,200 L125,280 L135,380 L100,380 L100,280 L100,380 L65,380 L75,280 L70,200 L65,100 L80,80 C80,65 85,50 100,50 Z" />
+                <circle cx="100" cy="40" r="25" fill="#f1f5f9" stroke="#334155" strokeWidth="2" />
+              </g>
 
-            {/* Internal Flow Indicator */}
-            {waterLevel > 0.3 && (
-               <g className="opacity-70">
-                 <defs>
-                   <linearGradient id="flowGrad" x1="0" x2="0" y1="1" y2="0">
-                     <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.2" />
-                     <stop offset="100%" stopColor="#3b82f6" stopOpacity="1" />
-                   </linearGradient>
-                 </defs>
-                 <g className="animate-flow-up">
-                    <path d="M95,370 L95,150" stroke="url(#flowGrad)" strokeWidth="4" strokeLinecap="round" strokeDasharray="5,5" />
-                    <path d="M105,370 L105,150" stroke="url(#flowGrad)" strokeWidth="4" strokeLinecap="round" strokeDasharray="5,5" />
+              {/* Internal Flow Indicator */}
+              {waterLevel > 0.3 && (
+                 <g className="opacity-70">
+                   <defs>
+                     <linearGradient id="flowGrad" x1="0" x2="0" y1="1" y2="0">
+                       <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.2" />
+                       <stop offset="100%" stopColor="#3b82f6" stopOpacity="1" />
+                     </linearGradient>
+                   </defs>
+                   <g className="animate-flow-up">
+                      <path d="M95,370 L95,150" stroke="url(#flowGrad)" strokeWidth="4" strokeLinecap="round" strokeDasharray="5,5" />
+                      <path d="M105,370 L105,150" stroke="url(#flowGrad)" strokeWidth="4" strokeLinecap="round" strokeDasharray="5,5" />
+                   </g>
+
+                   <path d="M100,360 L100,340" stroke="#2563eb" strokeWidth="2" markerEnd="url(#blueArrow)" className="animate-bounce-slight" />
+                   <path d="M100,280 L100,260" stroke="#2563eb" strokeWidth="2" markerEnd="url(#blueArrow)" className="animate-bounce-slight" style={{animationDelay: '0.2s'}} />
+                   <path d="M100,200 L100,180" stroke="#2563eb" strokeWidth="2" markerEnd="url(#blueArrow)" className="animate-bounce-slight" style={{animationDelay: '0.4s'}} />
                  </g>
-
-                 <path d="M100,360 L100,340" stroke="#2563eb" strokeWidth="2" markerEnd="url(#blueArrow)" className="animate-bounce-slight" />
-                 <path d="M100,280 L100,260" stroke="#2563eb" strokeWidth="2" markerEnd="url(#blueArrow)" className="animate-bounce-slight" style={{animationDelay: '0.2s'}} />
-                 <path d="M100,200 L100,180" stroke="#2563eb" strokeWidth="2" markerEnd="url(#blueArrow)" className="animate-bounce-slight" style={{animationDelay: '0.4s'}} />
-               </g>
-            )}
+              )}
+            </g>
 
             {/* Pressure Arrows */}
             {landmarks.map((mark, index) => {
