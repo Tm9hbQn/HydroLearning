@@ -3,7 +3,11 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Documentation
+- **System Blueprint**: Added `docs/ai/SYSTEM_BLUEPRINT.md` (Hebrew), a comprehensive architectural guide and future LMS roadmap.
+
 ### Fixes
+- **Linting**: Added `.eslintrc.cjs` to fix failing `npm run lint` command and ensure code quality checks pass.
 - **PascalLab**: Scaled human visualization height to ~1.8m (was visually ~2.2m) to maintain realistic proportions within the 2m water container.
 - **PascalLab**: Reverted water level gauge maximum to 2 meters. Fixed z-index layering to ensure the current level gauge is always visible on top.
 - **FractureMechanics**: Removed redundant "(0-100)" text from force gauge label. Removed the right-side arrow in "Shear" mode to declutter the visualization.
