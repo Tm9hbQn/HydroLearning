@@ -12,7 +12,7 @@ export const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
         type="range"
         ref={ref}
         className={cn(
-          "appearance-none bg-slate-200 rounded-full cursor-pointer accent-blue-600 opacity-80 hover:opacity-100 transition-opacity",
+          "appearance-none bg-ink/20 rounded-none cursor-pointer accent-sanguine opacity-80 hover:opacity-100 transition-opacity border border-ink/10",
           vertical ? "h-full w-2" : "w-full h-2",
           className
         )}

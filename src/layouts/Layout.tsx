@@ -6,22 +6,22 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans pb-12" dir="rtl">
-      <header className="bg-white shadow-sm sticky top-0 z-50 border-b border-slate-200">
+    <div className="min-h-screen bg-parchment text-ink font-sans pb-12" dir="rtl">
+      <header className="bg-parchment/95 backdrop-blur-sm sticky top-0 z-50 border-b-2 border-ink shadow-none">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <div>
-            <h1 className="text-xl md:text-2xl font-bold text-slate-900">{t('common.title')}</h1>
-            <p className="text-xs text-slate-500 mt-1">{t('common.subtitle')}</p>
+            <h1 className="text-xl md:text-2xl font-serif font-bold text-ink">{t('common.title')}</h1>
+            <p className="text-xs text-ink-light mt-1 font-mono tracking-wide">{t('common.subtitle')}</p>
           </div>
-          <div className="bg-blue-600 text-white p-2.5 rounded-full shadow-md shadow-blue-200">
-            <Activity size={24} />
+          <div className="bg-transparent border-2 border-sanguine text-sanguine p-2 rounded-full">
+            <Activity size={24} strokeWidth={2.5} />
           </div>
         </div>
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-8">
         {children}
-        <div className="text-center text-slate-400 text-sm py-8 border-t border-slate-200 mt-8">
+        <div className="text-center text-ink-light text-sm py-8 border-t border-ink/20 mt-8 font-mono">
            {t('common.footer')}
         </div>
       </main>

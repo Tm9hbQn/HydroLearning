@@ -44,14 +44,14 @@ export const FractureMechanics = () => {
     >
       <div className="flex flex-col gap-4">
         {/* Force Selection */}
-        <div className="flex gap-1 justify-center bg-slate-100 p-1 rounded-lg">
+        <div className="flex gap-1 justify-center bg-ink/5 p-1 rounded-sm border border-ink/10">
            {(['torsion', 'compression', 'tension', 'shear'] as const).map(ft => (
                <button
                 key={ft}
                 onClick={() => { setForceType(ft); setForceVal(0); }}
                 className={cn(
-                    "flex-1 py-2 text-xs rounded-md",
-                    forceType === ft ? 'bg-white shadow text-blue-700 font-bold' : 'text-slate-500'
+                    "flex-1 py-2 text-xs rounded-sm font-serif",
+                    forceType === ft ? 'bg-ink shadow-none text-parchment font-bold' : 'text-ink hover:bg-ink/10'
                 )}
                 >
                  {t(`fracture_mechanics.force_types.${ft}`)}
@@ -60,7 +60,7 @@ export const FractureMechanics = () => {
         </div>
 
         {/* Info Box */}
-        <div className="bg-blue-50 p-3 rounded-lg border border-blue-100 text-sm text-blue-800 text-center">
+        <div className="bg-parchment-dark p-3 rounded-sm border border-ink/20 text-sm text-ink text-center font-serif">
             <strong>{t('fracture_mechanics.force_source_label')}</strong> {t(`fracture_mechanics.force_sources.${forceType}`)}
         </div>
 
@@ -68,10 +68,10 @@ export const FractureMechanics = () => {
         <div className="flex flex-col items-center">
             <div className="relative w-40 h-56 perspective-1000 flex justify-center items-center mb-2">
                 {/* Bone Cylinder */}
-                <div className="w-24 h-48 bg-slate-50 border-x-2 border-slate-300 relative overflow-hidden transition-transform duration-100 origin-center shadow-lg z-10">
+                <div className="w-24 h-48 bg-parchment-light border-x-2 border-ink relative overflow-hidden transition-transform duration-100 origin-center shadow-none z-10">
                     <div className="absolute inset-0 w-full h-full opacity-40"
                          style={{
-                            backgroundImage: 'linear-gradient(#94a3b8 1px, transparent 1px), linear-gradient(90deg, #94a3b8 1px, transparent 1px)',
+                            backgroundImage: 'linear-gradient(#2b2118 1px, transparent 1px), linear-gradient(90deg, #2b2118 1px, transparent 1px)',
                             backgroundSize: '20px 20px',
                             transform: getTransform(),
                             transformOrigin: 'center'
@@ -80,31 +80,31 @@ export const FractureMechanics = () => {
                     <div style={getFractureStyle()}></div>
                 </div>
                 {/* Force Arrows */}
-                {forceType === 'shear' && <div className="absolute top-1/2 -left-6 text-3xl font-bold text-slate-600">→</div>}
-                {forceType === 'torsion' && <div className="absolute -top-6 text-3xl text-slate-600">↻</div>}
-                {forceType === 'torsion' && <div className="absolute -bottom-6 text-3xl text-slate-600">↺</div>}
-                {forceType === 'compression' && <div className="absolute -top-6 text-3xl text-slate-600">↓</div>}
-                {forceType === 'compression' && <div className="absolute -bottom-6 text-3xl text-slate-600">↑</div>}
-                {forceType === 'tension' && <div className="absolute -top-6 text-3xl text-slate-600">↑</div>}
-                {forceType === 'tension' && <div className="absolute -bottom-6 text-3xl text-slate-600">↓</div>}
+                {forceType === 'shear' && <div className="absolute top-1/2 -left-6 text-3xl font-bold text-ink">→</div>}
+                {forceType === 'torsion' && <div className="absolute -top-6 text-3xl text-ink">↻</div>}
+                {forceType === 'torsion' && <div className="absolute -bottom-6 text-3xl text-ink">↺</div>}
+                {forceType === 'compression' && <div className="absolute -top-6 text-3xl text-ink">↓</div>}
+                {forceType === 'compression' && <div className="absolute -bottom-6 text-3xl text-ink">↑</div>}
+                {forceType === 'tension' && <div className="absolute -top-6 text-3xl text-ink">↑</div>}
+                {forceType === 'tension' && <div className="absolute -bottom-6 text-3xl text-ink">↓</div>}
             </div>
 
             {/* Status Bar */}
             <div className={cn(
-                "w-full max-w-xs p-2 rounded text-center text-sm font-bold transition-all border",
-                isBroken ? 'bg-red-100 border-red-300 text-red-700' : 'bg-green-50 border-green-200 text-green-700'
+                "w-full max-w-xs p-2 rounded-sm text-center text-sm font-bold transition-all border font-mono",
+                isBroken ? 'bg-sanguine/10 border-sanguine text-sanguine' : 'bg-ink/5 border-ink/20 text-ink'
             )}>
                 {isBroken ? t('fracture_mechanics.status.broken') : t('fracture_mechanics.status.stable')}
             </div>
             {/* Clinical Note */}
-            <div className="text-xs text-slate-500 mt-2 p-2 bg-slate-50 rounded border border-slate-100 w-full text-center min-h-[3em]">
+            <div className="text-xs text-ink-light mt-2 p-2 bg-parchment-dark rounded-sm border border-ink/10 w-full text-center min-h-[3em] font-serif italic">
                 {t(`fracture_mechanics.clinical_notes.${forceType}`)}
             </div>
         </div>
 
         {/* Slider */}
         <div className="mt-2">
-            <label className="block text-center mb-1 text-slate-700 font-medium text-sm">{t('fracture_mechanics.force_intensity')}</label>
+            <label className="block text-center mb-1 text-ink font-medium text-sm font-serif">{t('fracture_mechanics.force_intensity')}</label>
             <Slider
                 min={0}
                 max={100}

@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  body {
+    @apply bg-parchment bg-grid-paper text-ink font-sans antialiased;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif font-bold text-ink;
+  }
+}
+
 @layer utilities {
   .animate-flow-up { animation: flow-up 2s ease-in-out infinite; }
   .animate-bounce-slight { animation: bounce-slight 2s ease-in-out infinite; }

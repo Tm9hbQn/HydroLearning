@@ -27,8 +27,8 @@ export const PascalLab = () => {
       <div className="flex flex-row gap-6 h-[350px] items-center">
 
         {/* Controls - Slider Centered */}
-        <div className="h-[200px] flex flex-col items-center justify-center bg-slate-50 rounded-xl p-2 border border-slate-200 shadow-inner w-16 shrink-0 relative">
-           <div className="text-[10px] font-bold text-blue-800 mb-2">2.0m</div>
+        <div className="h-[200px] flex flex-col items-center justify-center bg-parchment-dark rounded-sm p-2 border border-ink/20 w-16 shrink-0 relative">
+           <div className="text-[10px] font-bold text-ink mb-2 font-mono">2.0m</div>
            <Slider
             vertical
             min={0}
@@ -37,11 +37,11 @@ export const PascalLab = () => {
             value={waterLevel}
             onChange={(e) => setWaterLevel(parseFloat(e.target.value))}
           />
-          <div className="text-[10px] font-bold text-slate-500 mt-2">0m</div>
+          <div className="text-[10px] font-bold text-ink-light mt-2 font-mono">0m</div>
 
           {/* Moving Label */}
           <div
-            className="absolute right-full mr-2 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded shadow-md pointer-events-none transition-all whitespace-nowrap z-50"
+            className="absolute right-full mr-2 bg-ink text-parchment text-xs font-bold px-2 py-1 rounded-sm pointer-events-none transition-all whitespace-nowrap z-50 font-mono"
             style={{ top: `${100 - (waterLevel/2)*80 - 10}%` }}
           >
              {waterLevel.toFixed(2)}m
@@ -49,17 +49,17 @@ export const PascalLab = () => {
         </div>
 
         {/* Visualization Area */}
-        <div className="relative flex-1 border border-slate-200 rounded-xl overflow-hidden bg-white h-full">
+        <div className="relative flex-1 border border-ink rounded-sm overflow-hidden bg-parchment h-full">
 
           {/* Water Layer */}
           <div
-            className="absolute bottom-0 left-0 right-0 bg-blue-400/30 transition-all duration-100 ease-out border-t border-blue-500 shadow-lg z-10"
+            className="absolute bottom-0 left-0 right-0 bg-blue-900/10 transition-all duration-100 ease-out border-t border-blue-800/40 z-10"
             style={{ height: `${(waterLevel / 2.1) * 100}%` }}
           />
 
           {/* Water Surface Label - Moved out to be above body */}
           <div
-            className="absolute right-2 text-[10px] font-bold text-blue-700 bg-white/80 px-1 rounded-b z-50 transition-all duration-100 ease-out"
+            className="absolute right-2 text-[10px] font-bold text-ink bg-parchment/80 px-1 rounded-b-sm border border-t-0 border-ink/20 z-50 transition-all duration-100 ease-out font-mono"
             style={{ bottom: `${(waterLevel / 2.1) * 100}%` }}
           >
             {t('pascal_lab.water_surface')}
@@ -133,13 +133,13 @@ export const PascalLab = () => {
         </div>
       </div>
 
-      <div className="mt-4 flex gap-4 text-xs text-slate-600 justify-center">
+      <div className="mt-4 flex gap-4 text-xs text-ink-light justify-center font-serif">
         <div className="flex items-center gap-1">
-          <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+          <div className="w-3 h-3 bg-sanguine rounded-full"></div>
           <span>{t('pascal_lab.legend.external')}</span>
         </div>
         <div className="flex items-center gap-1">
-          <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+          <div className="w-3 h-3 bg-blue-900/50 rounded-full"></div>
           <span>{t('pascal_lab.legend.internal')}</span>
         </div>
       </div>
