@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, Droplets, RotateCcw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
 
 export const FluidJourney = () => {
   const { t } = useTranslation();
@@ -43,15 +44,15 @@ export const FluidJourney = () => {
 
         {/* Info Header */}
         <div className="mb-2 shrink-0">
-            <span className="text-xs font-bold bg-blue-100 text-blue-800 px-2 py-1 rounded mb-2 inline-block">
+            <span className="text-xs font-bold bg-ink/10 text-ink border border-ink/20 px-2 py-1 rounded-sm mb-2 inline-block font-mono">
                 {t('fluid_journey.step_counter', { current: step, total: 5 })}
             </span>
-            <h3 className="font-bold text-slate-800 text-lg mb-1">{steps[step].title}</h3>
-            <p className="text-sm text-slate-600 min-h-[3.5rem] leading-snug">{steps[step].text}</p>
+            <h3 className="font-bold font-serif text-ink text-lg mb-1">{steps[step].title}</h3>
+            <p className="text-sm text-ink-light min-h-[3.5rem] leading-snug font-serif italic">{steps[step].text}</p>
         </div>
 
         {/* Animation Canvas */}
-        <div className="flex-1 bg-slate-900 rounded-xl relative overflow-hidden border border-slate-700 w-full mb-4">
+        <div className="flex-1 bg-ink rounded-sm relative overflow-hidden border border-ink w-full mb-4">
 
            <svg viewBox="0 0 100 200" className="w-full h-full">
 
@@ -60,9 +61,9 @@ export const FluidJourney = () => {
                 className="transition-transform duration-1000 ease-in-out"
               >
                 {/* Background */}
-                <rect x="-100" y={step >= 1 ? "-100" : "200"} width="300" height="400" fill="#3b82f6" opacity="0.3" className="transition-all duration-1000" />
+                <rect x="-100" y={step >= 1 ? "-100" : "200"} width="300" height="400" fill="#f0e6d2" opacity="0.1" className="transition-all duration-1000" />
 
-                <g fill="#1e293b" stroke="#475569" strokeWidth="1">
+                <g fill="#2b2118" stroke="#5e4b35" strokeWidth="1">
                    <path d="M50,10 C60,10 65,20 65,25 L75,35 L70,90 L80,190 L50,190 L50,100 L50,190 L20,190 L30,90 L25,35 L35,25 C35,20 40,10 50,10 Z" />
                 </g>
 
@@ -182,20 +183,22 @@ export const FluidJourney = () => {
 
         {/* Big Buttons at Bottom */}
         <div className="flex gap-4 mt-auto">
-             <button
+             <Button
                onClick={handlePrev}
                disabled={step === 0}
-               className="flex-1 py-4 bg-blue-100 text-blue-800 rounded-xl font-bold text-lg hover:bg-blue-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
+               variant="secondary"
+               className="flex-1 py-6 rounded-sm font-bold text-lg flex justify-center items-center gap-2"
              >
                <ChevronRight /> {t('fluid_journey.buttons.prev')}
-             </button>
+             </Button>
 
-             <button
+             <Button
                onClick={handleNext}
-               className="flex-1 py-4 bg-blue-600 text-white rounded-xl font-bold text-lg hover:bg-blue-700 transition-colors shadow-lg flex justify-center items-center gap-2"
+               variant="primary"
+               className="flex-1 py-6 rounded-sm font-bold text-lg flex justify-center items-center gap-2"
              >
                {step === 5 ? t('fluid_journey.buttons.restart') : t('fluid_journey.buttons.next')} {step === 5 ? <RotateCcw size={20}/> : <ChevronLeft />}
-             </button>
+             </Button>
         </div>
 
       </div>

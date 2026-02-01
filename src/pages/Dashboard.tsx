@@ -12,9 +12,9 @@ export const Dashboard = () => {
 
   return (
     <div>
-      <div className="bg-white border-r-4 border-blue-500 shadow-sm rounded-lg p-6 mb-10">
-        <h2 className="font-bold text-lg text-slate-800 mb-2">{t('common.welcome_title')}</h2>
-        <p className="text-slate-600 leading-relaxed">
+      <div className="bg-parchment-dark border border-ink border-r-4 border-r-sanguine shadow-none rounded-sm p-6 mb-10">
+        <h2 className="font-serif font-bold text-xl text-ink mb-2">{t('common.welcome_title')}</h2>
+        <p className="text-ink/80 leading-relaxed font-serif">
           {t('common.welcome_desc')}
         </p>
       </div>
