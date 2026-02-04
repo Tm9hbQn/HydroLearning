@@ -1,15 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bone } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card } from '../../components/ui/Card';
 import { Slider } from '../../components/ui/Slider';
 import { cn } from '../../lib/utils';
 
-export const FractureMechanics = () => {
+export interface FractureMechanicsProps {
+  initialForceType?: 'torsion' | 'compression' | 'tension' | 'shear';
+}
+
+export const FractureMechanics: React.FC<FractureMechanicsProps> = ({ initialForceType = 'torsion' }) => {
   const { t } = useTranslation();
   const [forceVal, setForceVal] = useState(0);
-  const [forceType, setForceType] = useState<'torsion' | 'compression' | 'tension' | 'shear'>('torsion');
+  const [forceType, setForceType] = useState<'torsion' | 'compression' | 'tension' | 'shear'>(initialForceType);
   const isBroken = forceVal > 85;
+
+  // Update internal state if prop changes (reactive to content changes)
+  useEffect(() => {
+    setForceType(initialForceType);
+    setForceVal(0);
+  }, [initialForceType]);
 
   const getTransform = () => {
     const val = forceVal / 2;
@@ -81,7 +91,7 @@ export const FractureMechanics = () => {
                 </div>
                 {/* Force Arrows */}
                 {forceType === 'shear' && <div className="absolute top-1/2 -left-6 text-3xl font-bold text-slate-600">→</div>}
-                {forceType === 'torsion' && <div className="absolute -top-6 text-3xl text-slate-600">↻</div>}
+                {forceType === 'torsion' && <div className="absolute -top-6 text-3xl text-slate-600">↺</div>}
                 {forceType === 'torsion' && <div className="absolute -bottom-6 text-3xl text-slate-600">↺</div>}
                 {forceType === 'compression' && <div className="absolute -top-6 text-3xl text-slate-600">↓</div>}
                 {forceType === 'compression' && <div className="absolute -bottom-6 text-3xl text-slate-600">↑</div>}

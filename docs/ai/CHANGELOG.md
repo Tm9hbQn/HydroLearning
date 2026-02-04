@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- **Content OS**: Implemented a JSON-driven content architecture.
+    - Added `src/types/content.ts` for schema definitions (Course, Module, Unit, Block).
+    - Added `src/data/course_content.json` as the source of truth for the Fracture Mechanics course.
+    - Added `CourseManager`, `UnitRenderer`, and `BlockFactory` to dynamically render content.
+    - Added `TextBlock`, `ImageBlock`, and `FractureSimulationBlock` components.
+- **FractureMechanics Refactor**: Updated `FractureMechanics` to accept `initialForceType` prop for external control.
+- **Dashboard**: Replaced hardcoded feature list with the `CourseManager` rendering the Fracture Mechanics course.
+
 ### Fixes
 - **PascalLab**: Scaled human visualization height to ~1.8m (was visually ~2.2m) to maintain realistic proportions within the 2m water container.
 - **PascalLab**: Reverted water level gauge maximum to 2 meters. Fixed z-index layering to ensure the current level gauge is always visible on top.
