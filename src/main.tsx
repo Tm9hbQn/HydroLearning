@@ -6,33 +6,22 @@ import './index.css';
 import './lib/i18n';
 
 // Register Chart.js components if needed later, but for now just basic render
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
-} from 'chart.js';
+const rootElement = document.getElementById('root');
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
-);
-
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <ErrorBoundary>
-      <App />
-    </ErrorBoundary>
-  </React.StrictMode>,
-);
+if (!rootElement) {
+  console.error('Failed to find the root element');
+  document.body.innerHTML = '<div style="color: red; padding: 20px;"><h1>Critical Error</h1><p>Failed to find the root element. Application cannot start.</p></div>';
+} else {
+  try {
+    ReactDOM.createRoot(rootElement).render(
+      <React.StrictMode>
+        <ErrorBoundary>
+          <App />
+        </ErrorBoundary>
+      </React.StrictMode>,
+    );
+  } catch (error) {
+    console.error('Failed to render the app:', error);
+    rootElement.innerHTML = `<div style="color: red; padding: 20px;"><h1>Startup Error</h1><p>${error instanceof Error ? error.message : String(error)}</p></div>`;
+  }
+}
