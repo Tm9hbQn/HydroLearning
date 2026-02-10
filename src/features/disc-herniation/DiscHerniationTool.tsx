@@ -119,12 +119,12 @@ export const DiscHerniationTool = () => {
       <div className="flex flex-col items-center">
 
         {/* Controls */}
-        <div className="flex gap-2 mb-2 bg-slate-100 p-1 rounded-lg w-full justify-center">
+        <div className="flex gap-2 mb-2 bg-ink/5 p-1 rounded-sm w-full justify-center border border-ink/10">
           <button
             onClick={() => setView('top')}
             className={cn(
-                "flex-1 flex justify-center items-center gap-2 px-3 py-1 rounded-md text-sm",
-                view === 'top' ? 'bg-white shadow text-blue-600' : 'text-slate-500'
+                "flex-1 flex justify-center items-center gap-2 px-3 py-1 rounded-sm text-sm font-serif",
+                view === 'top' ? 'bg-ink shadow-none text-parchment' : 'text-ink hover:bg-ink/10'
             )}
             >
                 <Eye size={16} /> {t('disc_herniation.view.top')}
@@ -132,8 +132,8 @@ export const DiscHerniationTool = () => {
           <button
             onClick={() => setView('side')}
             className={cn(
-                "flex-1 flex justify-center items-center gap-2 px-3 py-1 rounded-md text-sm",
-                view === 'side' ? 'bg-white shadow text-blue-600' : 'text-slate-500'
+                "flex-1 flex justify-center items-center gap-2 px-3 py-1 rounded-sm text-sm font-serif",
+                view === 'side' ? 'bg-ink shadow-none text-parchment' : 'text-ink hover:bg-ink/10'
             )}
             >
                 <Layers size={16} /> {t('disc_herniation.view.side')}
@@ -141,12 +141,12 @@ export const DiscHerniationTool = () => {
         </div>
 
         {/* Viewer */}
-        <div className="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 flex flex-col justify-between h-[300px] relative">
+        <div className="w-full bg-ink/90 border border-ink rounded-sm p-4 flex flex-col justify-between h-[300px] relative">
             <div className="flex-1 flex justify-center items-center">
                 {view === 'top' ? renderTopView() : renderSideView()}
             </div>
 
-            <div className="bg-slate-900/80 rounded-lg p-2 flex flex-wrap gap-3 justify-center text-[11px] text-slate-300 w-full mt-2">
+            <div className="bg-ink rounded-sm border border-parchment/10 p-2 flex flex-wrap gap-3 justify-center text-[11px] text-parchment w-full mt-2 font-mono">
                 <div className="flex items-center gap-1"><div className="w-3 h-3 bg-slate-200 rounded-sm"></div>{t('disc_herniation.legend.vertebra')}</div>
                 <div className="flex items-center gap-1"><div className="w-3 h-3 bg-slate-400 rounded"></div>{t('disc_herniation.legend.annulus')}</div>
                 <div className="flex items-center gap-1"><div className="w-3 h-3 bg-red-500 rounded-full"></div>{t('disc_herniation.legend.nucleus')}</div>
@@ -154,8 +154,8 @@ export const DiscHerniationTool = () => {
             </div>
         </div>
 
-        <div className="my-4 text-center h-14 w-full px-4 flex items-center justify-center bg-blue-50 rounded-lg border border-blue-100">
-          <p className="text-slate-700 font-medium text-sm">
+        <div className="my-4 text-center h-14 w-full px-4 flex items-center justify-center bg-parchment-dark rounded-sm border border-ink/20">
+          <p className="text-ink font-serif font-medium text-sm">
             {t(`disc_herniation.stage_descriptions.${stage}`)}
           </p>
         </div>
@@ -166,8 +166,8 @@ export const DiscHerniationTool = () => {
                 key={s}
                 onClick={() => setStage(s)}
                 className={cn(
-                    "px-2 py-1 text-xs rounded-full border",
-                    stage === s ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white border-slate-200 text-slate-600'
+                    "px-2 py-1 text-xs rounded-sm border font-serif",
+                    stage === s ? 'bg-ink border-ink text-parchment' : 'bg-transparent border-ink/20 text-ink hover:bg-ink/10'
                 )}
             >
                 {t(`disc_herniation.stages.${s}`)}

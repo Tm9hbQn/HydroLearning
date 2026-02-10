@@ -31,6 +31,6 @@ describe('Card Component', () => {
         <div>C</div>
       </Card>
     );
-    expect(container.querySelector('.text-blue-600')).toBeInTheDocument();
+    expect(container.querySelector('.text-ink')).toBeInTheDocument();
   });
 });
