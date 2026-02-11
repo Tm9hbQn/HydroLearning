@@ -5,6 +5,8 @@ import { Card } from '../../components/ui/Card';
 import { Slider } from '../../components/ui/Slider';
 import { cn } from '../../lib/utils';
 
+const RESISTANCE_BARS = Array.from({ length: 6 });
+
 export const DragForceSim = () => {
   const { t } = useTranslation();
   const [speed, setSpeed] = useState(1);
@@ -115,7 +117,7 @@ export const DragForceSim = () => {
 
                 {/* Resistance Bars (Placeholders + Fill) */}
                 <div className="absolute top-0 bottom-0 -right-4 flex flex-col justify-center gap-2 z-0 w-1/2 pr-6">
-                    {[...Array(6)].map((_, i) => (
+                    {RESISTANCE_BARS.map((_, i) => (
                        <div key={i} className="h-2 w-full bg-slate-200 rounded-l-full shadow-inner overflow-hidden">
                            {/* Inner Fill - Exact correlation to gauge percent */}
                            <div
