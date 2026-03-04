@@ -16,10 +16,12 @@ export interface StretchMethod {
 }
 
 export interface MuscleImages {
-  /** Path to a photo/illustration of the muscle on a regular back view */
+  /** Photo/illustration showing the muscle on a regular back view */
   regular_back: string;
-  /** Path to an anatomical cross-section or highlight illustration */
+  /** Anatomical cross-section or highlight illustration */
   anatomical_cut: string;
+  /** Stretch demonstration image or animation */
+  stretch: string;
 }
 
 export interface MuscleData {
@@ -41,6 +43,8 @@ export interface MuscleData {
   location: string;
   /** Range of motion and resistance capabilities */
   actions: string;
+  /** How to consciously feel and isolate this muscle */
+  activation: string;
   /** The posture/position in which the muscle is maximally contracted */
   contracted_position: string;
   /** Best no-equipment (or minimal-equipment) stretch */
@@ -142,6 +146,13 @@ export const musclesData: MuscleData[] = [
       + 'תנגודת: גבוהה בטווחים קצרים, אך סיבולת נמוכה יחסית — '
       + 'הוא "ייצא" ראשון תחת עומס ממושך ויתחיל לכאוב.',
 
+    activation:
+      'שב/י זקוף ו"הכנס/י שכמות לכיס האחורי" — שכמות מתכנסות זו לזו תוך הורדתן מהאוזניים. '
+      + 'תרגיש/י את האזור בין השכמות מתקשה — זהו הטרפז האמצעי בפעולה. '
+      + 'לחלק העליון: הרם/י כתפיים לאוזניים בחוזקה (שרוג). '
+      + 'לחלק התחתון: הנמך/י כתפיים בכוונה תוך שמירה על גב ישר. '
+      + 'שים/שימי יד על השריר בכל פעולה — תחוש/י את ההקשחה ישירות.',
+
     contracted_position:
       'כתפיים מורמות לכיוון האוזניים + צוואר מוטה קלות לצד — "תנוחת הטלפון". '
       + 'כאשר אנחנו מחזיקים טלפון בין הכתף לאוזן, '
@@ -201,6 +212,7 @@ export const musclesData: MuscleData[] = [
     images: {
       regular_back: '/images/muscles/trapezius-back.jpg',
       anatomical_cut: '/images/muscles/trapezius-anatomy.jpg',
+      stretch: '/images/muscles/trapezius-stretch.jpg',
     },
   },
 
@@ -235,6 +247,13 @@ export const musclesData: MuscleData[] = [
       + 'עובדים ברציפות: בכל עמידה, ישיבה, ונשיאת עומס. '
       + 'תנגודת: גבוהה מאוד — יכולים להרים עומסים כבדים. '
       + 'סיבולת: בינונית — ישיבה ממושכת מחלישה ומקצרת אותם.',
+
+    activation:
+      'שים/שימי שתי ידיים על הגב התחתון משני צדי עמוד השדרה. '
+      + 'כוף/פי את הגב קדימה לאט — תרגיש/י את השרירים מתארכים. '
+      + 'כשתחזור/תחזרי לעמידה זקופה — תרגיש/י אותם מתכווצים ומחזירים אותך. '
+      + 'לתרגיל בידוד: שכב/י על הבטן, הרם/י חזה מהרצפה (תנוחת קוברה) — '
+      + 'תרגיש/י כיווץ ממוקד בגב התחתון. אם יש כאב — עצור/י מיד.',
 
     contracted_position:
       'גב מיושר לאחור מעבר לניטרל (Hyperextension) — '
@@ -298,6 +317,7 @@ export const musclesData: MuscleData[] = [
     images: {
       regular_back: '/images/muscles/erector-spinae-back.jpg',
       anatomical_cut: '/images/muscles/erector-spinae-anatomy.jpg',
+      stretch: '/images/muscles/erector-spinae-stretch.jpg',
     },
   },
 ];

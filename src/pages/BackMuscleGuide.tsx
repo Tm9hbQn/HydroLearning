@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import '../features/back-anatomy/BackMuscleGuide.css';
 import {
   musclesData,
@@ -7,7 +7,9 @@ import {
   getUniqueLayers,
   groupByLayer,
   type MuscleData,
+  type MuscleImages,
   type LayerMeta,
+  type StretchMethod,
 } from '../features/back-anatomy/muscleData';
 
 /* ============================================================
@@ -18,140 +20,247 @@ import {
    ============================================================ */
 
 /* ============================================================
+   CAROUSEL VIEWS CONFIG
+   ============================================================ */
+interface CarouselView { key: keyof MuscleImages; label: string; icon: string; }
+const CAROUSEL_VIEWS: CarouselView[] = [
+  { key: 'regular_back',   label: 'גב רגיל',    icon: '🧍' },
+  { key: 'anatomical_cut', label: 'חתך אנטומי',  icon: '🔬' },
+  { key: 'stretch',        label: 'מתיחה',        icon: '🤸' },
+];
+
+/* ============================================================
+   IMAGE SLIDE — graceful placeholder when asset is missing
+   ============================================================ */
+interface ImageSlideProps { src: string; alt: string; label: string; colorHex: string; }
+const ImageSlide: React.FC<ImageSlideProps> = ({ src, alt, label, colorHex }) => {
+  const [hasError, setHasError] = useState(false);
+  if (hasError || !src) {
+    return (
+      <div className="bmg-carousel__placeholder" style={{ '--ph-color': colorHex } as React.CSSProperties}>
+        <span className="bmg-carousel__ph-icon" aria-hidden="true">🖼</span>
+        <span className="bmg-carousel__ph-label">{label}</span>
+        <span className="bmg-carousel__ph-hint">תמונה תוצג כאן</span>
+      </div>
+    );
+  }
+  return <img className="bmg-carousel__img" src={src} alt={alt} loading="lazy" onError={() => setHasError(true)} />;
+};
+
+/* ============================================================
+   STRETCH CARD — used for primary stretch + each variant
+   ============================================================ */
+interface StretchCardProps { stretch: StretchMethod; colorHex: string; isMain?: boolean; }
+const StretchCard: React.FC<StretchCardProps> = ({ stretch, colorHex, isMain = false }) => (
+  <div className={`bmg-stretch-card ${isMain ? 'bmg-stretch-card--main' : ''}`}
+       style={isMain ? { borderInlineStartColor: colorHex } : {}}>
+    <div className="bmg-stretch-card__header">
+      <h5 className="bmg-stretch-card__title">{stretch.title}</h5>
+      <span className="bmg-stretch-card__equipment"
+            style={{ backgroundColor: `${colorHex}12`, color: colorHex, borderColor: `${colorHex}35` }}>
+        {stretch.equipment}
+      </span>
+    </div>
+    <ol className="bmg-stretch-card__steps" aria-label="שלבי המתיחה">
+      {stretch.steps.map((step, i) => (
+        <li key={i} className="bmg-stretch-card__step">
+          <span className="bmg-stretch-card__step-num" style={{ backgroundColor: colorHex }} aria-hidden="true">
+            {i + 1}
+          </span>
+          <span>{step}</span>
+        </li>
+      ))}
+    </ol>
+    <p className="bmg-stretch-card__duration">⏱ {stretch.duration}</p>
+  </div>
+);
+
+/* ============================================================
    MUSCLE CARD COMPONENT
    ============================================================ */
-interface MuscleCardProps {
-  muscle: MuscleData;
-  meta: LayerMeta;
-}
+interface MuscleCardProps { muscle: MuscleData; meta: LayerMeta; }
 
 const MuscleCard: React.FC<MuscleCardProps> = ({ muscle, meta }) => {
-  const [expanded, setExpanded] = useState(false);
-  const toggle = () => setExpanded((prev) => !prev);
+  const [expanded,     setExpanded]     = useState(false);
+  const [activeView,   setActiveView]   = useState(0);
+  const [variantsOpen, setVariantsOpen] = useState(false);
+
+  const currentView = CAROUSEL_VIEWS[activeView];
+  const total       = CAROUSEL_VIEWS.length;
+
+  const prevView = (e: React.MouseEvent) => { e.stopPropagation(); setActiveView((v) => (v - 1 + total) % total); };
+  const nextView = (e: React.MouseEvent) => { e.stopPropagation(); setActiveView((v) => (v + 1) % total); };
 
   return (
     <article id={muscle.id} className="bmg-card" role="listitem">
 
-      {/* ── Header (always visible — click to expand) ──── */}
+      {/* ── Header — always visible ──────────────────────── */}
       <div
         className="bmg-card__header"
-        onClick={toggle}
-        role="button"
-        tabIndex={0}
+        onClick={() => setExpanded((p) => !p)}
+        role="button" tabIndex={0}
         aria-expanded={expanded}
         aria-controls={`card-body-${muscle.id}`}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
-        }}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpanded((p) => !p); } }}
       >
         <div className="bmg-card__info">
-          {/* Coloured dot — layer colour via inline style */}
           <div className="bmg-card__dot" style={{ backgroundColor: meta.colorHex }} />
           <div>
             <div className="bmg-card__title-row">
               <h3 className="bmg-card__name">{muscle.name}</h3>
-              {/* Layer badge */}
-              <span
-                className="bmg-card__layer-badge"
-                style={{
-                  backgroundColor: `${meta.colorHex}18`,
-                  color: meta.colorHex,
-                  borderColor: `${meta.colorHex}40`,
-                }}
-              >
+              <span className="bmg-card__layer-badge"
+                    style={{ backgroundColor: `${meta.colorHex}18`, color: meta.colorHex, borderColor: `${meta.colorHex}40` }}>
                 {muscle.layer}
               </span>
-              {/* Chronic tension badge */}
               {muscle.isChronic && (
-                <span className="bmg-card__badge bmg-card__badge--chronic">
-                  ⚠ נוטה לתפיסה
-                </span>
+                <span className="bmg-card__badge bmg-card__badge--chronic">⚠ נוטה לתפיסה</span>
               )}
             </div>
             <p className="bmg-card__latin">{muscle.latinName}</p>
           </div>
         </div>
-        <span
-          className={`bmg-card__chevron ${expanded ? 'bmg-card__chevron--open' : ''}`}
-          aria-hidden="true"
-        >
+        <span className={`bmg-card__chevron ${expanded ? 'bmg-card__chevron--open' : ''}`} aria-hidden="true">
           <ChevronDown size={18} />
         </span>
       </div>
 
-      {/* ── Expanded Body ──────────────────────────────── */}
+      {/* ── Expanded body ────────────────────────────────── */}
       {expanded && (
         <div id={`card-body-${muscle.id}`} className="bmg-card__body">
 
-          {/* Overview / description */}
-          <div className="bmg-card__section">
+          {/* Overview description */}
+          <div className="bmg-card__overview">
             <p className="bmg-card__desc">{muscle.description}</p>
           </div>
 
-          {/* Anatomical location */}
-          <div className="bmg-card__section">
-            <div className="bmg-card__section-label">
-              <span aria-hidden="true">📍</span> מיקום
-            </div>
-            <p className="bmg-card__section-text">{muscle.location}</p>
-          </div>
+          {/* ── Two-column layout: [carousel] | [info sections] ── */}
+          <div className="bmg-card__layout">
 
-          {/* Range of motion & resistance */}
-          <div className="bmg-card__section bmg-card__section--alt">
-            <div className="bmg-card__section-label">
-              <span aria-hidden="true">↔️</span> פעולות וטווח תנועה
-            </div>
-            <p className="bmg-card__section-text">{muscle.actions}</p>
-          </div>
+            {/* CAROUSEL */}
+            <div className="bmg-card__carousel-col">
+              <div className="bmg-card__carousel" aria-label={`תצוגות ${muscle.name}`}>
 
-          {/* Contracted position — chronic muscles only */}
-          {muscle.isChronic && (
-            <div className="bmg-card__section bmg-card__section--warning">
-              <div className="bmg-card__section-label bmg-card__section-label--warning">
-                <span aria-hidden="true">⚠️</span> הכי מכווץ ב…
-              </div>
-              <p className="bmg-card__section-text">{muscle.contracted_position}</p>
-            </div>
-          )}
+                <div className="bmg-card__carousel-stage">
+                  <ImageSlide
+                    src={muscle.images[currentView.key]}
+                    alt={`${muscle.name} — ${currentView.label}`}
+                    label={currentView.label}
+                    colorHex={meta.colorHex}
+                  />
+                  {/* View label overlay */}
+                  <div className="bmg-card__view-badge" style={{ backgroundColor: `${meta.colorHex}d9` }}>
+                    <span aria-hidden="true">{currentView.icon}</span> {currentView.label}
+                  </div>
+                  {/* Arrow navigation */}
+                  <button className="bmg-card__carousel-arrow bmg-card__carousel-arrow--prev" onClick={prevView} aria-label="תצוגה קודמת">
+                    <ChevronRight size={16} />
+                  </button>
+                  <button className="bmg-card__carousel-arrow bmg-card__carousel-arrow--next" onClick={nextView} aria-label="תצוגה הבאה">
+                    <ChevronLeft size={16} />
+                  </button>
+                </div>
 
-          {/* Basic stretch */}
-          <div className="bmg-card__section">
-            <div className="bmg-card__section-label">
-              <span aria-hidden="true">🤸</span> מתיחה עיקרית
-              <span className="bmg-card__equipment-tag">{muscle.stretch_basic.equipment}</span>
-            </div>
-            <div className="bmg-card__stretch">
-              <h4 className="bmg-card__stretch-title">{muscle.stretch_basic.title}</h4>
-              <ol className="bmg-card__stretch-steps" aria-label="שלבי המתיחה">
-                {muscle.stretch_basic.steps.map((step, i) => (
-                  <li key={i} className="bmg-card__stretch-step">
-                    <span
-                      className="bmg-card__step-num"
-                      style={{ backgroundColor: meta.colorHex }}
-                      aria-hidden="true"
+                {/* Tab row */}
+                <div className="bmg-card__carousel-tabs" role="tablist" aria-label="בחר תצוגה">
+                  {CAROUSEL_VIEWS.map((view, i) => (
+                    <button
+                      key={view.key} role="tab"
+                      aria-selected={activeView === i}
+                      className={`bmg-card__tab ${activeView === i ? 'bmg-card__tab--active' : ''}`}
+                      style={activeView === i ? { borderColor: meta.colorHex, color: meta.colorHex, backgroundColor: `${meta.colorHex}0f` } : {}}
+                      onClick={(e) => { e.stopPropagation(); setActiveView(i); }}
                     >
-                      {i + 1}
-                    </span>
-                    <span>{step}</span>
-                  </li>
-                ))}
-              </ol>
-              <p className="bmg-card__stretch-duration">⏱ {muscle.stretch_basic.duration}</p>
-            </div>
-          </div>
+                      <span aria-hidden="true">{view.icon}</span>
+                      <span>{view.label}</span>
+                    </button>
+                  ))}
+                </div>
 
-          {/* Additional variants count — full carousel comes in Phase 4 */}
-          {muscle.stretch_variants.length > 0 && (
-            <div className="bmg-card__more-variants">
-              <span
-                className="bmg-card__more-variants__badge"
-                style={{ borderColor: `${meta.colorHex}50`, color: meta.colorHex }}
-              >
-                +{muscle.stretch_variants.length} דרכי מתיחה נוספות
-              </span>
-              <span className="bmg-card__more-variants__hint">יוצגו בשלב הבא</span>
+                {/* Dot indicators */}
+                <div className="bmg-card__carousel-dots" aria-hidden="true">
+                  {CAROUSEL_VIEWS.map((_, i) => (
+                    <span key={i}
+                          className={`bmg-card__dot-ind ${activeView === i ? 'bmg-card__dot-ind--active' : ''}`}
+                          style={activeView === i ? { backgroundColor: meta.colorHex } : {}} />
+                  ))}
+                </div>
+
+              </div>
+            </div>{/* end carousel col */}
+
+            {/* INFO SECTIONS */}
+            <div className="bmg-card__info-col">
+
+              <div className="bmg-card__section">
+                <div className="bmg-card__section-label">
+                  <span aria-hidden="true">📍</span> איתור — היכן השריר?
+                </div>
+                <p className="bmg-card__section-text">{muscle.location}</p>
+              </div>
+
+              <div className="bmg-card__section bmg-card__section--alt">
+                <div className="bmg-card__section-label">
+                  <span aria-hidden="true">↔️</span> פעולה והתנגדות
+                </div>
+                <p className="bmg-card__section-text">{muscle.actions}</p>
+              </div>
+
+              <div className="bmg-card__section">
+                <div className="bmg-card__section-label">
+                  <span aria-hidden="true">💪</span> איך להפעיל ולהרגיש?
+                </div>
+                <p className="bmg-card__section-text">{muscle.activation}</p>
+              </div>
+
+              {muscle.isChronic && (
+                <div className="bmg-card__section bmg-card__section--warning">
+                  <div className="bmg-card__section-label bmg-card__section-label--warning">
+                    <span aria-hidden="true">⚠️</span> תנוחת כיווץ מקסימלי
+                  </div>
+                  <p className="bmg-card__section-text">{muscle.contracted_position}</p>
+                </div>
+              )}
+
+            </div>{/* end info col */}
+          </div>{/* end .bmg-card__layout */}
+
+          {/* ── STRETCH SECTION — full-width strip below ── */}
+          <div className="bmg-card__stretch-section">
+
+            <div className="bmg-card__stretch-section-header">
+              <h4 className="bmg-card__stretch-section-title">🤸 שחרור ומתיחה</h4>
+              <div className="bmg-card__stretch-divider" style={{ backgroundColor: meta.colorHex }} />
             </div>
-          )}
+
+            {/* Primary — always visible */}
+            <div className="bmg-card__stretch-main">
+              <StretchCard stretch={muscle.stretch_basic} colorHex={meta.colorHex} isMain />
+            </div>
+
+            {/* Variants — toggled */}
+            {muscle.stretch_variants.length > 0 && (
+              <div className="bmg-card__variants-area">
+                <button
+                  className="bmg-card__variants-toggle"
+                  onClick={(e) => { e.stopPropagation(); setVariantsOpen((v) => !v); }}
+                  style={{ color: meta.colorHex, borderColor: `${meta.colorHex}45` }}
+                  aria-expanded={variantsOpen}
+                >
+                  <span className={`bmg-card__variants-chevron ${variantsOpen ? 'bmg-card__variants-chevron--open' : ''}`} aria-hidden="true">▼</span>
+                  {variantsOpen ? 'הסתר שיטות נוספות' : `הצג ${muscle.stretch_variants.length} דרכי מתיחה נוספות`}
+                </button>
+
+                {variantsOpen && (
+                  <div className="bmg-card__variants-grid">
+                    {muscle.stretch_variants.map((variant, i) => (
+                      <StretchCard key={i} stretch={variant} colorHex={meta.colorHex} />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+          </div>{/* end stretch section */}
 
         </div>
       )}
