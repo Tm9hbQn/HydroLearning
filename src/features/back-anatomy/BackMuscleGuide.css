@@ -1,0 +1,644 @@
+/* ============================================================
+   Back Muscle Anatomy Guide — CSS Foundation
+   ============================================================
+   Mobile-first, RTL-ready, CSS-variable driven.
+   Uses 'Assistant' (body) and 'Frank Ruhl Libre' (headings)
+   already loaded in index.html.
+   ============================================================ */
+
+/* ── Design Tokens ────────────────────────────────────────── */
+:root {
+  /* Typography */
+  --font-body: 'Assistant', 'Segoe UI', Tahoma, sans-serif;
+  --font-heading: 'Frank Ruhl Libre', 'David', serif;
+
+  /* Color Palette */
+  --clr-bg: #f8fafc;
+  --clr-surface: #ffffff;
+  --clr-surface-alt: #f1f5f9;
+
+  --clr-text: #1e293b;
+  --clr-text-secondary: #64748b;
+  --clr-text-muted: #94a3b8;
+
+  --clr-primary: #2563eb;
+  --clr-primary-light: #dbeafe;
+  --clr-primary-dark: #1e3a5f;
+
+  --clr-accent-orange: #f97316;
+  --clr-accent-blue: #3b82f6;
+  --clr-accent-purple: #8b5cf6;
+  --clr-accent-red: #ef4444;
+  --clr-accent-green: #22c55e;
+
+  --clr-border: #e2e8f0;
+  --clr-border-light: #f1f5f9;
+
+  /* Spacing Scale (4px base) */
+  --space-xs: 0.25rem;   /*  4px */
+  --space-sm: 0.5rem;    /*  8px */
+  --space-md: 1rem;      /* 16px */
+  --space-lg: 1.5rem;    /* 24px */
+  --space-xl: 2rem;      /* 32px */
+  --space-2xl: 3rem;     /* 48px */
+  --space-3xl: 4rem;     /* 64px */
+
+  /* Border Radius */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-nav: 0 2px 16px rgba(0, 0, 0, 0.10);
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
+
+  /* Layout */
+  --content-max-width: 720px;
+  --nav-height: 52px;
+  --header-height: auto;
+}
+
+/* ── Base Reset & Globals ─────────────────────────────────── */
+.bmg-page {
+  min-height: 100vh;
+  background-color: var(--clr-bg);
+  font-family: var(--font-body);
+  color: var(--clr-text);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.bmg-page *,
+.bmg-page *::before,
+.bmg-page *::after {
+  box-sizing: border-box;
+}
+
+/* ── Typography ───────────────────────────────────────────── */
+.bmg-page h1,
+.bmg-page h2,
+.bmg-page h3 {
+  font-family: var(--font-heading);
+  color: var(--clr-text);
+  line-height: 1.3;
+}
+
+/* ── Content Container ────────────────────────────────────── */
+.bmg-container {
+  width: 100%;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding-inline: var(--space-md);
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.bmg-header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1e40af 100%);
+  color: #ffffff;
+  padding: var(--space-xl) 0 var(--space-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle decorative pattern overlay */
+.bmg-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.10) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.bmg-header__content {
+  position: relative;
+  z-index: 1;
+}
+
+.bmg-header__title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 var(--space-xs);
+}
+
+.bmg-header__subtitle {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: #94a3b8;
+  font-weight: 400;
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+/* ============================================================
+   STICKY NAVIGATION
+   ============================================================ */
+.bmg-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: var(--clr-surface);
+  border-bottom: 1px solid var(--clr-border);
+  box-shadow: none;
+  transition: box-shadow var(--transition-base);
+}
+
+/* Shadow appears when nav is stuck (scrolled) — controlled via JS class */
+.bmg-nav--scrolled {
+  box-shadow: var(--shadow-nav);
+}
+
+.bmg-nav__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  height: var(--nav-height);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;          /* Firefox */
+  -ms-overflow-style: none;       /* IE/Edge */
+  scroll-behavior: smooth;
+  padding-inline: var(--space-md);
+  /* Snap for touch scrolling */
+  scroll-snap-type: x proximity;
+}
+
+.bmg-nav__inner::-webkit-scrollbar {
+  display: none;                  /* Chrome/Safari */
+}
+
+.bmg-nav__link {
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-md);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--clr-text-secondary);
+  background: var(--clr-surface-alt);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    transform var(--transition-fast);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bmg-nav__link:hover {
+  background-color: var(--clr-primary-light);
+  color: var(--clr-primary);
+  border-color: var(--clr-primary);
+}
+
+.bmg-nav__link:active {
+  transform: scale(0.96);
+}
+
+.bmg-nav__link--active {
+  background-color: var(--clr-primary);
+  color: #ffffff;
+  border-color: var(--clr-primary);
+}
+
+/* ============================================================
+   PEDAGOGICAL INTRODUCTION SECTION
+   ============================================================ */
+.bmg-intro {
+  padding: var(--space-xl) 0;
+}
+
+.bmg-intro__card {
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+  color: #ffffff;
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.bmg-intro__card::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -30%;
+  width: 60%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.bmg-intro__heading {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 var(--space-sm);
+  position: relative;
+  z-index: 1;
+}
+
+.bmg-intro__text {
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: #cbd5e1;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.bmg-intro__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-top: var(--space-md);
+  padding: 0;
+  background: none;
+  border: none;
+  color: #93c5fd;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+  position: relative;
+  z-index: 1;
+}
+
+.bmg-intro__toggle:hover {
+  color: #bfdbfe;
+}
+
+.bmg-intro__toggle-icon {
+  display: inline-flex;
+  transition: transform var(--transition-base);
+}
+
+.bmg-intro__toggle-icon--open {
+  transform: rotate(180deg);
+}
+
+.bmg-intro__expanded {
+  margin-top: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+  position: relative;
+  z-index: 1;
+}
+
+.bmg-intro__expanded p {
+  font-size: 0.875rem;
+  color: #cbd5e1;
+  line-height: 1.8;
+  margin: 0 0 var(--space-sm);
+}
+
+.bmg-intro__expanded p:last-child {
+  margin-bottom: 0;
+}
+
+/* Group Overview Cards (inside intro) */
+.bmg-intro__groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+}
+
+.bmg-group-overview {
+  background-color: var(--clr-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  border: 1px solid var(--clr-border);
+  border-inline-start-width: 4px;
+  transition: box-shadow var(--transition-base);
+}
+
+.bmg-group-overview:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.bmg-group-overview--superficial {
+  border-inline-start-color: var(--clr-accent-orange);
+}
+
+.bmg-group-overview--erector {
+  border-inline-start-color: var(--clr-accent-blue);
+}
+
+.bmg-group-overview--deep {
+  border-inline-start-color: var(--clr-accent-purple);
+}
+
+.bmg-group-overview__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.bmg-group-overview__icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.bmg-group-overview__name {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.bmg-group-overview__desc {
+  font-size: 0.85rem;
+  color: var(--clr-text-secondary);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* ============================================================
+   MAIN CONTENT — MUSCLE CARDS GRID
+   ============================================================ */
+.bmg-main {
+  padding-bottom: var(--space-3xl);
+}
+
+.bmg-section {
+  padding-top: var(--space-xl);
+  /* Offset for sticky nav when jumping via anchor */
+  scroll-margin-top: calc(var(--nav-height) + var(--space-md));
+}
+
+.bmg-section__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.bmg-section__color-bar {
+  width: 4px;
+  height: 2rem;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.bmg-section__color-bar--superficial { background-color: var(--clr-accent-orange); }
+.bmg-section__color-bar--erector     { background-color: var(--clr-accent-blue); }
+.bmg-section__color-bar--deep        { background-color: var(--clr-accent-purple); }
+
+.bmg-section__title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.bmg-section__count {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: var(--clr-text-muted);
+  font-weight: 400;
+}
+
+/* Quick-jump chips inside a section */
+.bmg-section__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.bmg-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-xs) var(--space-md);
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--clr-border);
+  background: var(--clr-surface);
+  color: var(--clr-text-secondary);
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.bmg-chip--superficial:hover,
+.bmg-chip--superficial:focus {
+  background-color: #fff7ed;
+  color: var(--clr-accent-orange);
+  border-color: var(--clr-accent-orange);
+}
+
+.bmg-chip--erector:hover,
+.bmg-chip--erector:focus {
+  background-color: #eff6ff;
+  color: var(--clr-accent-blue);
+  border-color: var(--clr-accent-blue);
+}
+
+.bmg-chip--deep:hover,
+.bmg-chip--deep:focus {
+  background-color: #f5f3ff;
+  color: var(--clr-accent-purple);
+  border-color: var(--clr-accent-purple);
+}
+
+/* Muscle Cards Container — CSS Grid */
+.bmg-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+}
+
+/* Placeholder card skeleton */
+.bmg-card {
+  background-color: var(--clr-surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--clr-border);
+  overflow: hidden;
+  transition: box-shadow var(--transition-base);
+}
+
+.bmg-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.bmg-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bmg-card__header:active {
+  background-color: var(--clr-surface-alt);
+}
+
+.bmg-card__info {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+}
+
+.bmg-card__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+
+.bmg-card__name {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.bmg-card__latin {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: var(--clr-text-muted);
+  font-style: italic;
+  margin: 2px 0 0;
+}
+
+.bmg-card__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  margin-top: var(--space-xs);
+}
+
+.bmg-card__badge--chronic {
+  background-color: #fef2f2;
+  color: var(--clr-accent-red);
+  border: 1px solid #fecaca;
+}
+
+.bmg-card__chevron {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: transform var(--transition-base), background-color var(--transition-fast);
+  color: var(--clr-text-muted);
+}
+
+.bmg-card__chevron--open {
+  background-color: var(--clr-surface-alt);
+  transform: rotate(180deg);
+}
+
+.bmg-card__body {
+  border-top: 1px solid var(--clr-border-light);
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.bmg-footer {
+  text-align: center;
+  padding: var(--space-xl) 0;
+  border-top: 1px solid var(--clr-border);
+  margin-top: var(--space-xl);
+}
+
+.bmg-footer__text {
+  font-size: 0.8rem;
+  color: var(--clr-text-muted);
+  margin: 0;
+}
+
+/* ============================================================
+   RESPONSIVE — Tablet & Up (≥640px)
+   ============================================================ */
+@media (min-width: 640px) {
+  .bmg-header__title {
+    font-size: 2rem;
+  }
+
+  .bmg-intro__card {
+    padding: var(--space-xl);
+  }
+
+  .bmg-intro__heading {
+    font-size: 1.5rem;
+  }
+
+  .bmg-cards-grid {
+    gap: var(--space-lg);
+  }
+}
+
+/* ============================================================
+   RESPONSIVE — Desktop (≥1024px)
+   ============================================================ */
+@media (min-width: 1024px) {
+  :root {
+    --content-max-width: 800px;
+  }
+
+  .bmg-header {
+    padding: var(--space-2xl) 0 var(--space-xl);
+  }
+
+  .bmg-header__title {
+    font-size: 2.25rem;
+  }
+
+  .bmg-intro__groups {
+    flex-direction: row;
+  }
+
+  .bmg-group-overview {
+    flex: 1;
+  }
+}
+
+/* ============================================================
+   UTILITY — Visually Hidden (a11y)
+   ============================================================ */
+.bmg-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
