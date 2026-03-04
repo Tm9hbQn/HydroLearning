@@ -352,7 +352,7 @@ const BackMuscleGuide: React.FC = () => {
       >
         <div className="bmg-container">
           <div className="bmg-nav__inner">
-            {layerGroups.map(({ layer, meta, muscles }) => (
+            {layerGroups.map(({ meta, muscles }) => (
               <button
                 key={meta.id}
                 className={`bmg-nav__link ${activeGroup === meta.id ? 'bmg-nav__link--active' : ''}`}
@@ -560,7 +560,7 @@ const BackMuscleGuide: React.FC = () => {
           ══════════════════════════════════════════════════ */}
       <main className="bmg-main bmg-container" role="main">
 
-        {layerGroups.map(({ layer, meta, muscles }) => (
+        {layerGroups.map(({ meta, muscles }) => (
           <section
             key={meta.id}
             id={`group-${meta.id}`}
