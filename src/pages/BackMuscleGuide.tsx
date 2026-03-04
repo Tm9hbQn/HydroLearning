@@ -1,24 +1,163 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { ChevronDown } from 'lucide-react';
 import '../features/back-anatomy/BackMuscleGuide.css';
+import {
+  musclesData,
+  LAYER_META,
+  getUniqueLayers,
+  groupByLayer,
+  type MuscleData,
+  type LayerMeta,
+} from '../features/back-anatomy/muscleData';
 
 /* ============================================================
-   Back Muscle Anatomy Guide — Phase 1: HTML/CSS Skeleton
+   Back Muscle Anatomy Guide
    ============================================================
-   Semantic HTML5 structure with:
-   • <header>  – site title
-   • <nav>     – sticky group navigation (quick-jump)
-   • <section> – pedagogical intro
-   • <section> – muscle cards grid (empty container)
-   • <footer>  – disclaimer
+   Data-driven — add muscles to muscleData.ts and they appear
+   automatically in the nav, sections, and quick-jump chips.
    ============================================================ */
 
-/* ── Placeholder data for the navigation & section shells ── */
-const MUSCLE_GROUPS = [
-  { id: 'superficial', name: 'שרירים שטחיים', icon: '🦾', count: 6 },
-  { id: 'erector',     name: 'שרירי יישר עמוד השדרה', icon: '⚡', count: 3 },
-  { id: 'deep',        name: 'שרירים עמוקים', icon: '🔬', count: 3 },
-] as const;
+/* ============================================================
+   MUSCLE CARD COMPONENT
+   ============================================================ */
+interface MuscleCardProps {
+  muscle: MuscleData;
+  meta: LayerMeta;
+}
+
+const MuscleCard: React.FC<MuscleCardProps> = ({ muscle, meta }) => {
+  const [expanded, setExpanded] = useState(false);
+  const toggle = () => setExpanded((prev) => !prev);
+
+  return (
+    <article id={muscle.id} className="bmg-card" role="listitem">
+
+      {/* ── Header (always visible — click to expand) ──── */}
+      <div
+        className="bmg-card__header"
+        onClick={toggle}
+        role="button"
+        tabIndex={0}
+        aria-expanded={expanded}
+        aria-controls={`card-body-${muscle.id}`}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+        }}
+      >
+        <div className="bmg-card__info">
+          {/* Coloured dot — layer colour via inline style */}
+          <div className="bmg-card__dot" style={{ backgroundColor: meta.colorHex }} />
+          <div>
+            <div className="bmg-card__title-row">
+              <h3 className="bmg-card__name">{muscle.name}</h3>
+              {/* Layer badge */}
+              <span
+                className="bmg-card__layer-badge"
+                style={{
+                  backgroundColor: `${meta.colorHex}18`,
+                  color: meta.colorHex,
+                  borderColor: `${meta.colorHex}40`,
+                }}
+              >
+                {muscle.layer}
+              </span>
+              {/* Chronic tension badge */}
+              {muscle.isChronic && (
+                <span className="bmg-card__badge bmg-card__badge--chronic">
+                  ⚠ נוטה לתפיסה
+                </span>
+              )}
+            </div>
+            <p className="bmg-card__latin">{muscle.latinName}</p>
+          </div>
+        </div>
+        <span
+          className={`bmg-card__chevron ${expanded ? 'bmg-card__chevron--open' : ''}`}
+          aria-hidden="true"
+        >
+          <ChevronDown size={18} />
+        </span>
+      </div>
+
+      {/* ── Expanded Body ──────────────────────────────── */}
+      {expanded && (
+        <div id={`card-body-${muscle.id}`} className="bmg-card__body">
+
+          {/* Overview / description */}
+          <div className="bmg-card__section">
+            <p className="bmg-card__desc">{muscle.description}</p>
+          </div>
+
+          {/* Anatomical location */}
+          <div className="bmg-card__section">
+            <div className="bmg-card__section-label">
+              <span aria-hidden="true">📍</span> מיקום
+            </div>
+            <p className="bmg-card__section-text">{muscle.location}</p>
+          </div>
+
+          {/* Range of motion & resistance */}
+          <div className="bmg-card__section bmg-card__section--alt">
+            <div className="bmg-card__section-label">
+              <span aria-hidden="true">↔️</span> פעולות וטווח תנועה
+            </div>
+            <p className="bmg-card__section-text">{muscle.actions}</p>
+          </div>
+
+          {/* Contracted position — chronic muscles only */}
+          {muscle.isChronic && (
+            <div className="bmg-card__section bmg-card__section--warning">
+              <div className="bmg-card__section-label bmg-card__section-label--warning">
+                <span aria-hidden="true">⚠️</span> הכי מכווץ ב…
+              </div>
+              <p className="bmg-card__section-text">{muscle.contracted_position}</p>
+            </div>
+          )}
+
+          {/* Basic stretch */}
+          <div className="bmg-card__section">
+            <div className="bmg-card__section-label">
+              <span aria-hidden="true">🤸</span> מתיחה עיקרית
+              <span className="bmg-card__equipment-tag">{muscle.stretch_basic.equipment}</span>
+            </div>
+            <div className="bmg-card__stretch">
+              <h4 className="bmg-card__stretch-title">{muscle.stretch_basic.title}</h4>
+              <ol className="bmg-card__stretch-steps" aria-label="שלבי המתיחה">
+                {muscle.stretch_basic.steps.map((step, i) => (
+                  <li key={i} className="bmg-card__stretch-step">
+                    <span
+                      className="bmg-card__step-num"
+                      style={{ backgroundColor: meta.colorHex }}
+                      aria-hidden="true"
+                    >
+                      {i + 1}
+                    </span>
+                    <span>{step}</span>
+                  </li>
+                ))}
+              </ol>
+              <p className="bmg-card__stretch-duration">⏱ {muscle.stretch_basic.duration}</p>
+            </div>
+          </div>
+
+          {/* Additional variants count — full carousel comes in Phase 4 */}
+          {muscle.stretch_variants.length > 0 && (
+            <div className="bmg-card__more-variants">
+              <span
+                className="bmg-card__more-variants__badge"
+                style={{ borderColor: `${meta.colorHex}50`, color: meta.colorHex }}
+              >
+                +{muscle.stretch_variants.length} דרכי מתיחה נוספות
+              </span>
+              <span className="bmg-card__more-variants__hint">יוצגו בשלב הבא</span>
+            </div>
+          )}
+
+        </div>
+      )}
+    </article>
+  );
+};
 
 /* ============================================================
    COMPONENT
@@ -32,6 +171,22 @@ const BackMuscleGuide: React.FC = () => {
   /* ── Refs ─────────────────────────────────────────────── */
   const navRef = useRef<HTMLElement>(null);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
+
+  /* ── Data: group muscles by layer (order from musclesData) ─ */
+  const layerGroups = useMemo(() => {
+    const grouped = groupByLayer(musclesData);
+    return getUniqueLayers(musclesData).map((layer) => ({
+      layer,
+      // Fall back gracefully if a layer isn't in LAYER_META yet
+      meta: LAYER_META[layer] ?? {
+        id: layer,
+        displayName: layer,
+        icon: '💪',
+        colorHex: '#64748b',
+      } as LayerMeta,
+      muscles: grouped[layer] ?? [],
+    }));
+  }, []);
 
   /* ── Sticky nav shadow on scroll ─────────────────────── */
   useEffect(() => {
@@ -88,15 +243,18 @@ const BackMuscleGuide: React.FC = () => {
       >
         <div className="bmg-container">
           <div className="bmg-nav__inner">
-            {MUSCLE_GROUPS.map((group) => (
+            {layerGroups.map(({ layer, meta, muscles }) => (
               <button
-                key={group.id}
-                className={`bmg-nav__link ${activeGroup === group.id ? 'bmg-nav__link--active' : ''}`}
-                onClick={() => scrollToGroup(group.id)}
-                aria-current={activeGroup === group.id ? 'true' : undefined}
+                key={meta.id}
+                className={`bmg-nav__link ${activeGroup === meta.id ? 'bmg-nav__link--active' : ''}`}
+                onClick={() => scrollToGroup(meta.id)}
+                aria-current={activeGroup === meta.id ? 'true' : undefined}
               >
-                <span aria-hidden="true">{group.icon}</span>
-                {group.name}
+                <span aria-hidden="true">{meta.icon}</span>
+                {meta.displayName}
+                <span className="bmg-nav__count" aria-label={`${muscles.length} שרירים`}>
+                  {muscles.length}
+                </span>
               </button>
             ))}
           </div>
@@ -293,78 +451,58 @@ const BackMuscleGuide: React.FC = () => {
           ══════════════════════════════════════════════════ */}
       <main className="bmg-main bmg-container" role="main">
 
-        {MUSCLE_GROUPS.map((group) => (
+        {layerGroups.map(({ layer, meta, muscles }) => (
           <section
-            key={group.id}
-            id={`group-${group.id}`}
-            ref={(el) => { sectionRefs.current[group.id] = el; }}
+            key={meta.id}
+            id={`group-${meta.id}`}
+            ref={(el) => { sectionRefs.current[meta.id] = el; }}
             className="bmg-section"
-            aria-labelledby={`section-title-${group.id}`}
+            aria-labelledby={`section-title-${meta.id}`}
           >
             {/* ── Section Header ───────────────────────── */}
             <div className="bmg-section__header">
-              <div className={`bmg-section__color-bar bmg-section__color-bar--${group.id}`} />
+              <div
+                className="bmg-section__color-bar"
+                style={{ backgroundColor: meta.colorHex }}
+              />
               <div>
-                <h2 id={`section-title-${group.id}`} className="bmg-section__title">
-                  <span aria-hidden="true">{group.icon} </span>
-                  {group.name}
+                <h2 id={`section-title-${meta.id}`} className="bmg-section__title">
+                  <span aria-hidden="true">{meta.icon} </span>
+                  {meta.displayName}
                 </h2>
-                <span className="bmg-section__count">{group.count} שרירים</span>
+                <span className="bmg-section__count">{muscles.length} שרירים</span>
               </div>
             </div>
 
-            {/* ── Quick-jump chips (placeholders) ──────── */}
-            <div className="bmg-section__chips" role="list" aria-label={`ניווט מהיר — ${group.name}`}>
-              {Array.from({ length: group.count }, (_, i) => (
+            {/* ── Quick-jump chips — one per muscle in this layer ── */}
+            <div
+              className="bmg-section__chips"
+              role="list"
+              aria-label={`ניווט מהיר — ${meta.displayName}`}
+            >
+              {muscles.map((m) => (
                 <button
-                  key={i}
-                  className={`bmg-chip bmg-chip--${group.id}`}
+                  key={m.id}
+                  className="bmg-chip"
+                  style={{'--chip-hover-color': meta.colorHex} as React.CSSProperties}
                   role="listitem"
+                  onClick={() =>
+                    document.getElementById(m.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                  }
                 >
-                  שריר {i + 1}
+                  {m.name}
                 </button>
               ))}
             </div>
 
-            {/* ── Cards Grid (empty container) ─────────── */}
-            <div className="bmg-cards-grid" role="list" aria-label={`כרטיסי שרירים — ${group.name}`}>
-              {/*
-                Muscle cards will be dynamically rendered here.
-                Each card will be an <article> with class "bmg-card".
-
-                Example skeleton of a single card:
-              */}
-              {Array.from({ length: group.count }, (_, i) => (
-                <article key={i} className="bmg-card" role="listitem">
-                  <div className="bmg-card__header" tabIndex={0} aria-expanded={false}>
-                    <div className="bmg-card__info">
-                      <div
-                        className="bmg-card__dot"
-                        style={{
-                          backgroundColor:
-                            group.id === 'superficial'
-                              ? 'var(--clr-accent-orange)'
-                              : group.id === 'erector'
-                                ? 'var(--clr-accent-blue)'
-                                : 'var(--clr-accent-purple)',
-                        }}
-                      />
-                      <div>
-                        <h3 className="bmg-card__name">שם השריר {i + 1}</h3>
-                        <p className="bmg-card__latin">Muscle Latin Name</p>
-                        {i === 0 && (
-                          <span className="bmg-card__badge bmg-card__badge--chronic">
-                            ⚠ נוטה לתפיסה כרונית
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <span className="bmg-card__chevron" aria-hidden="true">
-                      <ChevronDown size={18} />
-                    </span>
-                  </div>
-                  {/* Card body will be rendered here when expanded */}
-                </article>
+            {/* ── Muscle Cards Grid ─────────────────────── */}
+            <div
+              className="bmg-cards-grid"
+              role="list"
+              aria-label={`כרטיסי שרירים — ${meta.displayName}`}
+            >
+              {muscles.map((muscle) => (
+                <MuscleCard key={muscle.id} muscle={muscle} meta={meta} />
               ))}
             </div>
           </section>

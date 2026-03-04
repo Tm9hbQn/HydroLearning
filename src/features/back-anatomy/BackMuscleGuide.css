@@ -658,25 +658,13 @@
     border-color var(--transition-fast);
 }
 
-.bmg-chip--superficial:hover,
-.bmg-chip--superficial:focus {
-  background-color: #fff7ed;
-  color: var(--clr-accent-orange);
-  border-color: var(--clr-accent-orange);
-}
-
-.bmg-chip--erector:hover,
-.bmg-chip--erector:focus {
-  background-color: #eff6ff;
-  color: var(--clr-accent-blue);
-  border-color: var(--clr-accent-blue);
-}
-
-.bmg-chip--deep:hover,
-.bmg-chip--deep:focus {
-  background-color: #f5f3ff;
-  color: var(--clr-accent-purple);
-  border-color: var(--clr-accent-purple);
+/* Chip hover: colour driven by --chip-hover-color CSS variable set inline */
+.bmg-chip:hover,
+.bmg-chip:focus {
+  color: var(--chip-hover-color, var(--clr-primary));
+  border-color: var(--chip-hover-color, var(--clr-primary));
+  background-color: color-mix(in srgb, var(--chip-hover-color, var(--clr-primary)) 10%, white);
+  outline: none;
 }
 
 /* Muscle Cards Container — CSS Grid */
@@ -776,8 +764,201 @@
   transform: rotate(180deg);
 }
 
+/* ── Card title row — name + badges in one flex line ────── */
+.bmg-card__title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+/* Layer badge — colours set via inline style */
+.bmg-card__layer-badge {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  border: 1px solid;
+  white-space: nowrap;
+}
+
+/* ── Nav count pill ──────────────────────────────────────── */
+.bmg-nav__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  border-radius: var(--radius-full);
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.bmg-nav__link--active .bmg-nav__count {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* ── Section colour bar — now driven by inline style ──────  */
+/* (the modifier classes are kept for backwards compat)       */
+.bmg-section__color-bar--intermediate { background-color: var(--clr-accent-blue); }
+
+/* ── Card body ───────────────────────────────────────────── */
 .bmg-card__body {
   border-top: 1px solid var(--clr-border-light);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Labeled section inside the body */
+.bmg-card__section {
+  padding: var(--space-md);
+  border-bottom: 1px solid var(--clr-border-light);
+}
+
+.bmg-card__section:last-child {
+  border-bottom: none;
+}
+
+.bmg-card__section--alt {
+  background-color: var(--clr-surface-alt);
+}
+
+.bmg-card__section--warning {
+  background-color: #fff8f8;
+}
+
+.bmg-card__section-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--clr-text-muted);
+  margin-bottom: var(--space-sm);
+}
+
+.bmg-card__section-label--warning {
+  color: var(--clr-accent-red);
+}
+
+/* Description paragraph — slightly larger than the rest */
+.bmg-card__desc {
+  font-size: 0.9rem;
+  line-height: 1.75;
+  color: var(--clr-text);
+  margin: 0;
+}
+
+.bmg-card__section-text {
+  font-size: 0.85rem;
+  line-height: 1.75;
+  color: var(--clr-text-secondary);
+  margin: 0;
+}
+
+/* Equipment tag inside the label */
+.bmg-card__equipment-tag {
+  margin-inline-start: auto;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--clr-text-muted);
+  background: var(--clr-bg);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-full);
+  padding: 1px 8px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* ── Stretch card inside the body ────────────────────────── */
+.bmg-card__stretch {
+  background: var(--clr-bg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--clr-border);
+  padding: var(--space-md);
+}
+
+.bmg-card__stretch-title {
+  font-family: var(--font-heading);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--clr-text);
+  margin: 0 0 var(--space-md);
+}
+
+/* Ordered steps list */
+.bmg-card__stretch-steps {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  counter-reset: stretch-step;
+}
+
+.bmg-card__stretch-step {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  font-size: 0.85rem;
+  line-height: 1.7;
+  color: var(--clr-text-secondary);
+}
+
+/* Numbered circle — colour set via inline style */
+.bmg-card__step-num {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.bmg-card__stretch-duration {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--clr-text-muted);
+  margin: 0;
+}
+
+/* ── Additional variants count row ───────────────────────── */
+.bmg-card__more-variants {
+  padding: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.bmg-card__more-variants__badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-full);
+  border: 1px dashed;
+  cursor: default;
+}
+
+.bmg-card__more-variants__hint {
+  font-size: 0.73rem;
+  color: var(--clr-text-muted);
+  font-style: italic;
 }
 
 /* ============================================================
