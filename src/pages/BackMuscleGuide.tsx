@@ -107,24 +107,47 @@ const BackMuscleGuide: React.FC = () => {
           PEDAGOGICAL INTRODUCTION
           ══════════════════════════════════════════════════ */}
       <section className="bmg-intro bmg-container" aria-labelledby="intro-heading">
-        {/* Main intro card */}
+        {/* ── Main intro card ───────────────────────────── */}
         <article className="bmg-intro__card">
+
+          {/* Title */}
           <h2 id="intro-heading" className="bmg-intro__heading">
-            מה זה שרירי הגב ולמה חשוב להכיר אותם?
+            מבוא: המכונה המופלאה של שרירי הגב
           </h2>
-          <p className="bmg-intro__text">
-            {/* Placeholder — real pedagogical content will go here */}
-            הגב הוא מרכז התמיכה, התנועה והיציבות של כל הגוף. הבנה אנטומית של שרירי הגב
-            מאפשרת לנו לזהות מקורות כאב, למנוע פציעות, ולשחרר מתחים כרוניים בצורה ממוקדת.
+
+          {/* Lead paragraph — always visible */}
+          <p className="bmg-intro__lead">
+            הגב שלנו הוא לא סתם &quot;קיר&quot; אחורי, אלא מערכת מורכבת ורב-שכבתית של
+            שרירים, שעובדים בהרמוניה מושלמת כדי להחזיק אותנו זקופים, לאפשר לנו לנוע
+            במרחב, ולהגן על עמוד השדרה שלנו.
           </p>
 
+          {/* Anatomical illustration placeholder */}
+          <div
+            className="bmg-intro__image-placeholder"
+            role="img"
+            aria-label="מקום שמור לאיור אנטומי של שכבות שרירי הגב"
+          >
+            <span className="bmg-intro__image-placeholder__icon" aria-hidden="true">🩻</span>
+            <span>איור אנטומי — שכבות שרירי הגב</span>
+            <span className="bmg-intro__image-placeholder__sub">תמונה תוכנס בשלב הבא</span>
+          </div>
+
+          {/* Bridge paragraph */}
+          <p className="bmg-intro__bridge">
+            כדי להבין למה הגב שלנו כואב, נתפס או מפתח דלקות, צריך קודם כל להבין איך הוא
+            בנוי. נהוג לחלק את שרירי הגב ל<strong>שלוש קבוצות עיקריות (שכבות)</strong>,
+            שלכל אחת תפקיד שונה לחלוטין:
+          </p>
+
+          {/* Expand/collapse toggle */}
           <button
             className="bmg-intro__toggle"
             onClick={() => setIntroExpanded((prev) => !prev)}
             aria-expanded={introExpanded}
             aria-controls="intro-expanded"
           >
-            {introExpanded ? 'הסתר הסבר מלא' : 'הרחב: הסבר פדגוגי מלא'}
+            {introExpanded ? 'הסתר הסבר מלא' : 'קרא את ההסבר המלא על שלוש השכבות'}
             <span
               className={`bmg-intro__toggle-icon ${introExpanded ? 'bmg-intro__toggle-icon--open' : ''}`}
               aria-hidden="true"
@@ -133,23 +156,94 @@ const BackMuscleGuide: React.FC = () => {
             </span>
           </button>
 
+          {/* ── Expandable body ────────────────────────────── */}
           {introExpanded && (
             <div id="intro-expanded" className="bmg-intro__expanded">
-              <p>
-                {/* Placeholder paragraph 1 */}
-                שרירי הגב מאורגנים בשלוש שכבות עיקריות: שטחית, ביניים ועמוקה.
-                כל שכבה ממלאה תפקיד שונה — מתנועה גסה ועד לייצוב עדין של חוליה בודדת.
+
+              {/* The 3 layers */}
+              <ol className="bmg-intro__layer-list" aria-label="שלוש שכבות שרירי הגב">
+
+                <li className="bmg-intro__layer-item bmg-intro__layer-item--superficial">
+                  <h3 className="bmg-intro__layer-heading">
+                    <span className="bmg-intro__layer-num" aria-hidden="true">1</span>
+                    השכבה השטחית
+                    <span className="bmg-intro__layer-sub">(Superficial)</span>
+                    <span className="bmg-intro__layer-role">שרירי התנועה הגדולה</span>
+                  </h3>
+                  <p className="bmg-intro__layer-text">
+                    אלו השרירים הגדולים והבולטים ביותר (כמו{' '}
+                    <strong>הטרפז</strong> או <strong>הרחב-גבי</strong>). התפקיד העיקרי
+                    שלהם הוא בכלל לא להחזיק את הגב, אלא <strong>להניע את הכתפיים
+                    והזרועות שלנו</strong>. הם נכנסים לפעולה כשאנחנו מרימים משא, מושכים
+                    משהו, או שוחים. כאשר הם עובדים קשה מדי או בתנוחה לא נכונה (כמו רכינה
+                    ממושכת מול מסך), הם נוטים <strong>להתקצר ולהיתפס</strong>.
+                  </p>
+                </li>
+
+                <li className="bmg-intro__layer-item bmg-intro__layer-item--erector">
+                  <h3 className="bmg-intro__layer-heading">
+                    <span className="bmg-intro__layer-num" aria-hidden="true">2</span>
+                    השכבה האמצעית
+                    <span className="bmg-intro__layer-sub">(Intermediate)</span>
+                    <span className="bmg-intro__layer-role">שרירי הנשימה והייצוב</span>
+                  </h3>
+                  <p className="bmg-intro__layer-text">
+                    שכבה זו כוללת שרירים קטנים יותר (כמו <strong>המעוינים</strong>), שיושבים
+                    מתחת לשכבה השטחית. התפקיד שלהם הוא לייצב את השכמות ולעזור לכלוב הצלעות
+                    להתרחב ולהתכווץ בזמן נשימה עמוקה. מתח נפשי או נשימה שטחית משפיעים
+                    עליהם ישירות ויוצרים <strong>&quot;קשרים&quot; (נקודות טריגר)</strong> כואבים
+                    בין השכמות.
+                  </p>
+                </li>
+
+                <li className="bmg-intro__layer-item bmg-intro__layer-item--deep">
+                  <h3 className="bmg-intro__layer-heading">
+                    <span className="bmg-intro__layer-num" aria-hidden="true">3</span>
+                    השכבה העמוקה
+                    <span className="bmg-intro__layer-sub">(Deep)</span>
+                    <span className="bmg-intro__layer-role">שרירי היציבה והליבה</span>
+                  </h3>
+                  <p className="bmg-intro__layer-text">
+                    אלו שרירים קטנים וחזקים (כמו <strong>זוקפי הגב</strong>) שצמודים ממש
+                    לעמוד השדרה. הם עובדים <strong>24/7</strong> (כל עוד אנחנו לא שוכבים)
+                    כדי להתנגד לכוח המשיכה ולשמור עלינו זקופים. ישיבה ממושכת מחלישה אותם,
+                    מה שגורם לעומס לעבור לרצועות ולדיסקים, ומוביל ל
+                    <strong>כאבים כרוניים בגב התחתון</strong>.
+                  </p>
+                </li>
+
+              </ol>
+
+              {/* System integration section */}
+              <section className="bmg-intro__integration" aria-labelledby="integration-heading">
+                <h3 id="integration-heading" className="bmg-intro__integration-heading">
+                  איך זה משתלב עם שאר הגוף?
+                </h3>
+                <p className="bmg-intro__layer-text">
+                  שרירי הגב לא עובדים בוואקום. הם מחוברים למערכות אחרות בצורה הדוקה:
+                </p>
+                <ul className="bmg-intro__integration-list">
+                  <li className="bmg-intro__integration-item">
+                    <strong>מערכת העצבים:</strong> חוט השדרה עובר ממש בתוך המערכת הזו.
+                    שריר גב מכווץ מדי עלול ללחוץ על עצב (כמו במקרה של סיאטיקה), מה שיקרין
+                    כאב חד לאגן או לרגליים.
+                  </li>
+                  <li className="bmg-intro__integration-item">
+                    <strong>רקמת החיבור (Fascia):</strong> הגב התחתון מכוסה ברקמת חיבור
+                    רחבה (<em>Thoracolumbar fascia</em>) שמחברת בין פלג הגוף העליון לתחתון.
+                    לכן לפעמים כאב בגב נובע בכלל משרירי ישבן או ירך אחורית קצרים מדי.
+                  </li>
+                </ul>
+              </section>
+
+              {/* Closing mission callout */}
+              <p className="bmg-intro__callout">
+                המטרה של המדריך הזה היא לעזור לכם{' '}
+                <strong>לזהות בדיוק איזה שריר &quot;צועק&quot; עכשיו</strong>, להבין מה
+                המכניקה שלו, ובעיקר — ללמוד איך לשחרר אותו בצורה עצמאית דרך מתיחות מדויקות
+                והרפיה. בהמשך תוכלו לנווט לכל שריר באופן ספציפי ולראות אותו מבפנים ומבחוץ.
               </p>
-              <p>
-                {/* Placeholder paragraph 2 */}
-                שרירים רבים בגב &quot;אוגרים&quot; מתח רגשי ופיזי: הטרפציוס העליון
-                מגיב ללחץ, המולטיפידוס נחלש בעקבות כאב, וריבועי המותן מוגבל בישיבה ממושכת.
-              </p>
-              <p>
-                {/* Placeholder paragraph 3 */}
-                לימוד שרירי הגב עוזר לנו להבין: מה הגורם לכאב, כיצד למנוע אותו,
-                ואיך לשחרר ולחזק בצורה ממוקדת ומדויקת.
-              </p>
+
             </div>
           )}
         </article>
@@ -163,20 +257,20 @@ const BackMuscleGuide: React.FC = () => {
               <h3 className="bmg-group-overview__name">שרירים שטחיים</h3>
             </div>
             <p className="bmg-group-overview__desc">
-              {/* Placeholder */}
-              השרירים הגדולים והנראים של הגב — אחראיים על תנועה גסה וגישור בין עמוד השדרה לכתפיים.
+              השרירים הגדולים והבולטים (טרפז, רחב-גבי). אחראיים על הנעת הכתפיים
+              והזרועות — <strong>נוטים להתקצר ולהיתפס</strong> בישיבה ממושכת.
             </p>
           </article>
 
-          {/* Erector Spinae */}
+          {/* Erector Spinae / Intermediate */}
           <article className="bmg-group-overview bmg-group-overview--erector" role="listitem">
             <div className="bmg-group-overview__header">
               <span className="bmg-group-overview__icon" aria-hidden="true">⚡</span>
-              <h3 className="bmg-group-overview__name">שרירי יישר עמוד השדרה</h3>
+              <h3 className="bmg-group-overview__name">שכבה אמצעית</h3>
             </div>
             <p className="bmg-group-overview__desc">
-              {/* Placeholder */}
-              שלושה עמודים של שרירים הרצים לאורך כל עמוד השדרה — הכוח שמחזיק את הגוף זקוף.
+              שרירים קטנים (מעוינים) שמייצבים שכמות ומסייעים בנשימה. מתח נפשי
+              יוצר <strong>נקודות טריגר כואבות</strong> בין השכמות.
             </p>
           </article>
 
@@ -187,8 +281,8 @@ const BackMuscleGuide: React.FC = () => {
               <h3 className="bmg-group-overview__name">שרירים עמוקים</h3>
             </div>
             <p className="bmg-group-overview__desc">
-              {/* Placeholder */}
-              השרירים הבלתי נראים — אחראיים על יציבות עדינה בין חוליה לחוליה.
+              זוקפי הגב — עובדים 24/7 נגד כוח המשיכה. ישיבה ממושכת מחלישה אותם
+              ומעבירה את העומס <strong>לדיסקים ולרצועות</strong>.
             </p>
           </article>
         </div>
