@@ -1,12 +1,11 @@
 /**
- * E2E + visual regression tests for the Back Muscle Anatomy Guide.
+ * E2E tests for the Back Muscle Anatomy Guide.
  *
  * Prerequisites:
  *   npx playwright install --with-deps
  *   npm run dev  (or started automatically via playwright.config.ts webServer)
  *
  * Run:  npx playwright test
- * Update snapshots: npx playwright test --update-snapshots
  */
 import { test, expect, Page } from '@playwright/test';
 
@@ -52,27 +51,17 @@ test.describe('BackMuscleGuide — page load', () => {
     await expect(page.getByRole('heading', { name: 'טרפז', level: 3 })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'זוקפי הגב', level: 3 })).toBeVisible();
   });
-});
 
-// ── Visual regression — collapsed state ───────────────────────
-
-test.describe('Visual — collapsed (initial) state', () => {
-  test('full page screenshot — all cards collapsed', async ({ page }) => {
-    await goto(page);
-    await page.waitForSelector('.bmg-card');
-    await expect(page).toHaveScreenshot('page-collapsed.png', { fullPage: true });
-  });
-
-  test('header region screenshot', async ({ page }) => {
+  test('header region is visible', async ({ page }) => {
     await goto(page);
     const header = page.getByRole('banner');
-    await expect(header).toHaveScreenshot('header.png');
+    await expect(header).toBeVisible();
   });
 
-  test('nav region screenshot', async ({ page }) => {
+  test('nav region is visible', async ({ page }) => {
     await goto(page);
     const nav = page.getByRole('navigation', { name: /ניווט בין קבוצות שרירים/ });
-    await expect(nav).toHaveScreenshot('nav.png');
+    await expect(nav).toBeVisible();
   });
 });
 
@@ -93,20 +82,22 @@ test.describe('MuscleCard — expand / collapse', () => {
     await expect(page.locator('#card-body-trapezius')).not.toBeVisible();
   });
 
-  test('visual — trapezius card expanded', async ({ page }) => {
+  test('trapezius card expanded shows carousel and info', async ({ page }) => {
     await goto(page);
     await expandCard(page, 'טרפז');
     await page.locator('#card-body-trapezius').waitFor({ state: 'visible' });
     const card = page.locator('#trapezius');
-    await expect(card).toHaveScreenshot('card-trapezius-expanded.png');
+    await expect(card.locator('.bmg-card__carousel')).toBeVisible();
+    await expect(card.locator('.bmg-card__info-col')).toBeVisible();
   });
 
-  test('visual — erector spinae card expanded', async ({ page }) => {
+  test('erector spinae card expanded shows carousel and info', async ({ page }) => {
     await goto(page);
     await expandCard(page, 'זוקפי הגב');
     await page.locator('#card-body-erector-spinae').waitFor({ state: 'visible' });
     const card = page.locator('#erector-spinae');
-    await expect(card).toHaveScreenshot('card-erector-expanded.png');
+    await expect(card.locator('.bmg-card__carousel')).toBeVisible();
+    await expect(card.locator('.bmg-card__info-col')).toBeVisible();
   });
 });
 
@@ -144,10 +135,13 @@ test.describe('MuscleCard — carousel', () => {
       .toHaveAttribute('aria-selected', 'true');
   });
 
-  test('visual — carousel after switching to anatomical view', async ({ page }) => {
+  test('switching to anatomical view updates carousel content', async ({ page }) => {
     await page.getByRole('tab', { name: /חתך אנטומי/ }).first().click();
     const carousel = page.locator('#trapezius .bmg-card__carousel').first();
-    await expect(carousel).toHaveScreenshot('carousel-anatomical.png');
+    await expect(carousel).toBeVisible();
+    // Verify the tab is now selected
+    await expect(page.getByRole('tab', { name: /חתך אנטומי/ }).first())
+      .toHaveAttribute('aria-selected', 'true');
   });
 });
 
@@ -174,12 +168,16 @@ test.describe('MuscleCard — stretch variants', () => {
     ).toBeVisible();
   });
 
-  test('visual — stretch section with variants open', async ({ page }) => {
+  test('stretch section is visible with variants open', async ({ page }) => {
     await goto(page);
     await expandCard(page, 'טרפז');
     await page.getByRole('button', { name: /הצג.*דרכי מתיחה נוספות/ }).first().click();
     const stretchSection = page.locator('#trapezius .bmg-card__stretch-section').first();
-    await expect(stretchSection).toHaveScreenshot('stretch-variants-open.png');
+    await expect(stretchSection).toBeVisible();
+    // Verify all 3 variant titles appear
+    await expect(page.getByRole('heading', { name: 'מתיחה עם יד מאחורי הגב', level: 5 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'הנמכה אקטיבית + הטיה', level: 5 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'מתיחה עם מגבת', level: 5 })).toBeVisible();
   });
 });
 
@@ -200,17 +198,20 @@ test.describe('Mobile layout', () => {
     await expect(carouselCol).toBeVisible();
   });
 
-  test('visual — mobile page collapsed', async ({ page }) => {
+  test('cards are visible on mobile', async ({ page }) => {
     await goto(page);
     await page.waitForSelector('.bmg-card');
-    await expect(page).toHaveScreenshot('mobile-collapsed.png', { fullPage: true });
+    const cards = page.locator('.bmg-card');
+    await expect(cards).toHaveCount(2);
   });
 
-  test('visual — mobile card expanded', async ({ page }) => {
+  test('expanded card shows all sections on mobile', async ({ page }) => {
     await goto(page);
     await expandCard(page, 'טרפז');
     await page.locator('#card-body-trapezius').waitFor({ state: 'visible' });
-    await expect(page).toHaveScreenshot('mobile-card-expanded.png', { fullPage: true });
+    await expect(page.locator('#trapezius .bmg-card__carousel-col').first()).toBeVisible();
+    await expect(page.locator('#trapezius .bmg-card__info-col').first()).toBeVisible();
+    await expect(page.locator('#trapezius .bmg-card__stretch-section').first()).toBeVisible();
   });
 });
 

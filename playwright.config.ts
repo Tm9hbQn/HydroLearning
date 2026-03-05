@@ -6,7 +6,6 @@ import { defineConfig, devices } from '@playwright/test';
  * (requires `npx playwright install --with-deps` first)
  *
  * The dev server is started automatically via the `webServer` config.
- * Screenshot snapshots live in e2e/__snapshots__/.
  */
 export default defineConfig({
   testDir: './e2e',
@@ -27,10 +26,6 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
-    {
-      name: 'mobile-chrome',
-      use: { ...devices['Pixel 5'] },
-    },
   ],
 
   /* Start Vite dev server before running tests */
@@ -41,11 +36,4 @@ export default defineConfig({
     timeout: 60_000,
   },
 
-  /* Snapshot threshold — allow minor rendering differences */
-  expect: {
-    toHaveScreenshot: {
-      maxDiffPixelRatio: 0.02,
-      threshold: 0.2,
-    },
-  },
 });

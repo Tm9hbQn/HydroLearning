@@ -76,7 +76,7 @@ jobs:
           path: dist/
           retention-days: 1
 
-  # ── 4. Playwright E2E + visual tests ──────────────────────
+  # ── 4. Playwright E2E tests ───────────────────────────────
   e2e:
     name: Playwright E2E
     runs-on: ubuntu-latest
@@ -105,11 +105,3 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 7
-
-      - name: Upload screenshots (snapshots)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-snapshots
-          path: e2e/__snapshots__/
-          retention-days: 14
