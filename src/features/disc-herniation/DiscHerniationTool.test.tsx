@@ -6,28 +6,19 @@ import { DiscHerniationTool } from './DiscHerniationTool';
 describe('DiscHerniationTool', () => {
   it('renders correctly with initial state', () => {
     render(<DiscHerniationTool />);
-    // Check for title
-    expect(screen.getByText('disc_herniation.title')).toBeInTheDocument();
-    // Check for initial stage description (normal)
-    expect(screen.getByText('disc_herniation.stage_descriptions.normal')).toBeInTheDocument();
+    expect(screen.getByText('פתופיזיולוגיה של הדיסק הבין-חולייתי')).toBeInTheDocument();
+    expect(screen.getByText(/מצב תקין\. הגרעין/)).toBeInTheDocument();
   });
 
   it('updates stage on button click', () => {
     render(<DiscHerniationTool />);
 
-    // Find and click the 'bulge' button
-    // The button text is translated using key `disc_herniation.stages.bulge`
-    const bulgeButton = screen.getByText('disc_herniation.stages.bulge');
+    const bulgeButton = screen.getByText('בלט');
     fireEvent.click(bulgeButton);
+    expect(screen.getByText(/בלט דיסק \(Bulge\)/)).toBeInTheDocument();
 
-    // Verify stage description updates
-    expect(screen.getByText('disc_herniation.stage_descriptions.bulge')).toBeInTheDocument();
-
-    // Find and click the 'extrusion' button
-    const extrusionButton = screen.getByText('disc_herniation.stages.extrusion');
+    const extrusionButton = screen.getByText('פריצה');
     fireEvent.click(extrusionButton);
-
-    // Verify stage description updates
-    expect(screen.getByText('disc_herniation.stage_descriptions.extrusion')).toBeInTheDocument();
+    expect(screen.getByText(/פריצת דיסק \(Herniation\)/)).toBeInTheDocument();
   });
 });

@@ -2,21 +2,29 @@ import React from 'react';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import { Layout } from './layouts/Layout';
 import { Dashboard } from './pages/Dashboard';
-import BackMuscleGuide from './pages/BackMuscleGuide';
+import HomePage from './pages/HomePage';
+
+const BackMuscleGuide = React.lazy(() => import('./pages/BackMuscleGuide'));
 
 function App() {
-  console.log('HydroLearning App Initialized (v2)');
   return (
     <Router>
       <Routes>
-        {/* Back Muscle Guide — standalone page (own header/nav) */}
-        <Route path="/" element={<BackMuscleGuide />} />
-
-        {/* Legacy routes keep existing Layout wrapper */}
-        <Route element={<Layout><Dashboard /></Layout>}>
-          <Route path="/dashboard" element={<Dashboard />} />
+        {/* Shared layout with persistent header/nav */}
+        <Route element={<Layout />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/tools" element={<Dashboard />} />
         </Route>
-        <Route path="/test" element={<div className="p-8 text-center text-green-600 font-bold text-xl">React Router is Working!</div>} />
+
+        {/* Back Muscle Guide — standalone page (own header/nav/CSS) */}
+        <Route
+          path="/back-anatomy"
+          element={
+            <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center text-slate-400">טוען...</div>}>
+              <BackMuscleGuide />
+            </React.Suspense>
+          }
+        />
       </Routes>
     </Router>
   );

@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import '../features/back-anatomy/BackMuscleGuide.css';
 import {
   musclesData,
@@ -23,24 +25,19 @@ import {
    CAROUSEL VIEWS CONFIG
    ============================================================ */
 interface CarouselView { key: keyof MuscleImages; label: string; icon: string; }
-const CAROUSEL_VIEWS: CarouselView[] = [
-  { key: 'regular_back',   label: 'גב רגיל',    icon: '🧍' },
-  { key: 'anatomical_cut', label: 'חתך אנטומי',  icon: '🔬' },
-  { key: 'stretch',        label: 'מתיחה',        icon: '🤸' },
-];
 
 /* ============================================================
    IMAGE SLIDE — graceful placeholder when asset is missing
    ============================================================ */
-interface ImageSlideProps { src: string; alt: string; label: string; colorHex: string; }
-const ImageSlide: React.FC<ImageSlideProps> = ({ src, alt, label, colorHex }) => {
+interface ImageSlideProps { src: string; alt: string; label: string; colorHex: string; placeholderText: string; }
+const ImageSlide: React.FC<ImageSlideProps> = ({ src, alt, label, colorHex, placeholderText }) => {
   const [hasError, setHasError] = useState(false);
   if (hasError || !src) {
     return (
       <div className="bmg-carousel__placeholder" style={{ '--ph-color': colorHex } as React.CSSProperties}>
         <span className="bmg-carousel__ph-icon" aria-hidden="true">🖼</span>
         <span className="bmg-carousel__ph-label">{label}</span>
-        <span className="bmg-carousel__ph-hint">תמונה תוצג כאן</span>
+        <span className="bmg-carousel__ph-hint">{placeholderText}</span>
       </div>
     );
   }
@@ -50,8 +47,8 @@ const ImageSlide: React.FC<ImageSlideProps> = ({ src, alt, label, colorHex }) =>
 /* ============================================================
    STRETCH CARD — used for primary stretch + each variant
    ============================================================ */
-interface StretchCardProps { stretch: StretchMethod; colorHex: string; isMain?: boolean; }
-const StretchCard: React.FC<StretchCardProps> = ({ stretch, colorHex, isMain = false }) => (
+interface StretchCardProps { stretch: StretchMethod; colorHex: string; isMain?: boolean; stepsLabel: string; }
+const StretchCard: React.FC<StretchCardProps> = ({ stretch, colorHex, isMain = false, stepsLabel }) => (
   <div className={`bmg-stretch-card ${isMain ? 'bmg-stretch-card--main' : ''}`}
        style={isMain ? { borderInlineStartColor: colorHex } : {}}>
     <div className="bmg-stretch-card__header">
@@ -61,7 +58,7 @@ const StretchCard: React.FC<StretchCardProps> = ({ stretch, colorHex, isMain = f
         {stretch.equipment}
       </span>
     </div>
-    <ol className="bmg-stretch-card__steps" aria-label="שלבי המתיחה">
+    <ol className="bmg-stretch-card__steps" aria-label={stepsLabel}>
       {stretch.steps.map((step, i) => (
         <li key={i} className="bmg-stretch-card__step">
           <span className="bmg-stretch-card__step-num" style={{ backgroundColor: colorHex }} aria-hidden="true">
@@ -78,15 +75,16 @@ const StretchCard: React.FC<StretchCardProps> = ({ stretch, colorHex, isMain = f
 /* ============================================================
    MUSCLE CARD COMPONENT
    ============================================================ */
-interface MuscleCardProps { muscle: MuscleData; meta: LayerMeta; }
+interface MuscleCardProps { muscle: MuscleData; meta: LayerMeta; carouselViews: CarouselView[]; }
 
-const MuscleCard: React.FC<MuscleCardProps> = ({ muscle, meta }) => {
+const MuscleCard: React.FC<MuscleCardProps> = ({ muscle, meta, carouselViews }) => {
+  const { t } = useTranslation();
   const [expanded,     setExpanded]     = useState(false);
   const [activeView,   setActiveView]   = useState(0);
   const [variantsOpen, setVariantsOpen] = useState(false);
 
-  const currentView = CAROUSEL_VIEWS[activeView];
-  const total       = CAROUSEL_VIEWS.length;
+  const currentView = carouselViews[activeView];
+  const total       = carouselViews.length;
 
   const prevView = (e: React.MouseEvent) => { e.stopPropagation(); setActiveView((v) => (v - 1 + total) % total); };
   const nextView = (e: React.MouseEvent) => { e.stopPropagation(); setActiveView((v) => (v + 1) % total); };
@@ -113,7 +111,7 @@ const MuscleCard: React.FC<MuscleCardProps> = ({ muscle, meta }) => {
                 {muscle.layer}
               </span>
               {muscle.isChronic && (
-                <span className="bmg-card__badge bmg-card__badge--chronic">⚠ נוטה לתפיסה</span>
+                <span className="bmg-card__badge bmg-card__badge--chronic">⚠ {t('back_muscle_guide.card_sections.chronic_badge')}</span>
               )}
             </div>
             <p className="bmg-card__latin">{muscle.latinName}</p>
@@ -138,7 +136,7 @@ const MuscleCard: React.FC<MuscleCardProps> = ({ muscle, meta }) => {
 
             {/* CAROUSEL */}
             <div className="bmg-card__carousel-col">
-              <div className="bmg-card__carousel" aria-label={`תצוגות ${muscle.name}`}>
+              <div className="bmg-card__carousel" aria-label={`${t('back_muscle_guide.carousel_label')} ${muscle.name}`}>
 
                 <div className="bmg-card__carousel-stage">
                   <ImageSlide
@@ -146,23 +144,24 @@ const MuscleCard: React.FC<MuscleCardProps> = ({ muscle, meta }) => {
                     alt={`${muscle.name} — ${currentView.label}`}
                     label={currentView.label}
                     colorHex={meta.colorHex}
+                    placeholderText={t('back_muscle_guide.image_placeholder')}
                   />
                   {/* View label overlay */}
                   <div className="bmg-card__view-badge" style={{ backgroundColor: `${meta.colorHex}d9` }}>
                     <span aria-hidden="true">{currentView.icon}</span> {currentView.label}
                   </div>
                   {/* Arrow navigation */}
-                  <button className="bmg-card__carousel-arrow bmg-card__carousel-arrow--prev" onClick={prevView} aria-label="תצוגה קודמת">
+                  <button className="bmg-card__carousel-arrow bmg-card__carousel-arrow--prev" onClick={prevView} aria-label={t('back_muscle_guide.carousel_prev')}>
                     <ChevronRight size={16} />
                   </button>
-                  <button className="bmg-card__carousel-arrow bmg-card__carousel-arrow--next" onClick={nextView} aria-label="תצוגה הבאה">
+                  <button className="bmg-card__carousel-arrow bmg-card__carousel-arrow--next" onClick={nextView} aria-label={t('back_muscle_guide.carousel_next')}>
                     <ChevronLeft size={16} />
                   </button>
                 </div>
 
                 {/* Tab row */}
-                <div className="bmg-card__carousel-tabs" role="tablist" aria-label="בחר תצוגה">
-                  {CAROUSEL_VIEWS.map((view, i) => (
+                <div className="bmg-card__carousel-tabs" role="tablist" aria-label={t('back_muscle_guide.carousel_tab_label')}>
+                  {carouselViews.map((view, i) => (
                     <button
                       key={view.key} role="tab"
                       aria-selected={activeView === i}
@@ -178,7 +177,7 @@ const MuscleCard: React.FC<MuscleCardProps> = ({ muscle, meta }) => {
 
                 {/* Dot indicators */}
                 <div className="bmg-card__carousel-dots" aria-hidden="true">
-                  {CAROUSEL_VIEWS.map((_, i) => (
+                  {carouselViews.map((_, i) => (
                     <span key={i}
                           className={`bmg-card__dot-ind ${activeView === i ? 'bmg-card__dot-ind--active' : ''}`}
                           style={activeView === i ? { backgroundColor: meta.colorHex } : {}} />
@@ -193,21 +192,21 @@ const MuscleCard: React.FC<MuscleCardProps> = ({ muscle, meta }) => {
 
               <div className="bmg-card__section">
                 <div className="bmg-card__section-label">
-                  <span aria-hidden="true">📍</span> איתור — היכן השריר?
+                  <span aria-hidden="true">📍</span> {t('back_muscle_guide.card_sections.location_label')}
                 </div>
                 <p className="bmg-card__section-text">{muscle.location}</p>
               </div>
 
               <div className="bmg-card__section bmg-card__section--alt">
                 <div className="bmg-card__section-label">
-                  <span aria-hidden="true">↔️</span> פעולה והתנגדות
+                  <span aria-hidden="true">↔️</span> {t('back_muscle_guide.card_sections.actions_label')}
                 </div>
                 <p className="bmg-card__section-text">{muscle.actions}</p>
               </div>
 
               <div className="bmg-card__section">
                 <div className="bmg-card__section-label">
-                  <span aria-hidden="true">💪</span> איך להפעיל ולהרגיש?
+                  <span aria-hidden="true">💪</span> {t('back_muscle_guide.card_sections.activation_label')}
                 </div>
                 <p className="bmg-card__section-text">{muscle.activation}</p>
               </div>
@@ -215,7 +214,7 @@ const MuscleCard: React.FC<MuscleCardProps> = ({ muscle, meta }) => {
               {muscle.isChronic && (
                 <div className="bmg-card__section bmg-card__section--warning">
                   <div className="bmg-card__section-label bmg-card__section-label--warning">
-                    <span aria-hidden="true">⚠️</span> תנוחת כיווץ מקסימלי
+                    <span aria-hidden="true">⚠️</span> {t('back_muscle_guide.card_sections.contracted_label')}
                   </div>
                   <p className="bmg-card__section-text">{muscle.contracted_position}</p>
                 </div>
@@ -228,13 +227,13 @@ const MuscleCard: React.FC<MuscleCardProps> = ({ muscle, meta }) => {
           <div className="bmg-card__stretch-section">
 
             <div className="bmg-card__stretch-section-header">
-              <h4 className="bmg-card__stretch-section-title">🤸 שחרור ומתיחה</h4>
+              <h4 className="bmg-card__stretch-section-title">🤸 {t('back_muscle_guide.card_sections.stretch_title')}</h4>
               <div className="bmg-card__stretch-divider" style={{ backgroundColor: meta.colorHex }} />
             </div>
 
             {/* Primary — always visible */}
             <div className="bmg-card__stretch-main">
-              <StretchCard stretch={muscle.stretch_basic} colorHex={meta.colorHex} isMain />
+              <StretchCard stretch={muscle.stretch_basic} colorHex={meta.colorHex} isMain stepsLabel={t('back_muscle_guide.stretch_steps_label')} />
             </div>
 
             {/* Variants — toggled */}
@@ -247,13 +246,15 @@ const MuscleCard: React.FC<MuscleCardProps> = ({ muscle, meta }) => {
                   aria-expanded={variantsOpen}
                 >
                   <span className={`bmg-card__variants-chevron ${variantsOpen ? 'bmg-card__variants-chevron--open' : ''}`} aria-hidden="true">▼</span>
-                  {variantsOpen ? 'הסתר שיטות נוספות' : `הצג ${muscle.stretch_variants.length} דרכי מתיחה נוספות`}
+                  {variantsOpen
+                    ? t('back_muscle_guide.card_sections.hide_variants')
+                    : t('back_muscle_guide.card_sections.show_variants', { count: muscle.stretch_variants.length })}
                 </button>
 
                 {variantsOpen && (
                   <div className="bmg-card__variants-grid">
                     {muscle.stretch_variants.map((variant, i) => (
-                      <StretchCard key={i} stretch={variant} colorHex={meta.colorHex} />
+                      <StretchCard key={i} stretch={variant} colorHex={meta.colorHex} stepsLabel={t('back_muscle_guide.stretch_steps_label')} />
                     ))}
                   </div>
                 )}
@@ -269,9 +270,11 @@ const MuscleCard: React.FC<MuscleCardProps> = ({ muscle, meta }) => {
 };
 
 /* ============================================================
-   COMPONENT
+   MAIN PAGE COMPONENT
    ============================================================ */
 const BackMuscleGuide: React.FC = () => {
+  const { t } = useTranslation();
+
   /* ── State ────────────────────────────────────────────── */
   const [introExpanded, setIntroExpanded] = useState(false);
   const [navScrolled, setNavScrolled] = useState(false);
@@ -281,12 +284,22 @@ const BackMuscleGuide: React.FC = () => {
   const navRef = useRef<HTMLElement>(null);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
+  /* ── Carousel views from i18n ─────────────────────────── */
+  const carouselViews: CarouselView[] = useMemo(() => {
+    const views = t('back_muscle_guide.carousel_views', { returnObjects: true }) as Record<string, string>;
+    const icons = t('back_muscle_guide.carousel_icons', { returnObjects: true }) as Record<string, string>;
+    return (Object.keys(views) as (keyof MuscleImages)[]).map((key) => ({
+      key,
+      label: views[key],
+      icon: icons[key] ?? '📷',
+    }));
+  }, [t]);
+
   /* ── Data: group muscles by layer (order from musclesData) ─ */
   const layerGroups = useMemo(() => {
     const grouped = groupByLayer(musclesData);
     return getUniqueLayers(musclesData).map((layer) => ({
       layer,
-      // Fall back gracefully if a layer isn't in LAYER_META yet
       meta: LAYER_META[layer] ?? {
         id: layer,
         displayName: layer,
@@ -296,6 +309,23 @@ const BackMuscleGuide: React.FC = () => {
       muscles: grouped[layer] ?? [],
     }));
   }, []);
+
+  /* ── Layer data from i18n ──────────────────────────────── */
+  const layerKeys = ['superficial', 'intermediate', 'deep'] as const;
+  const layerData = useMemo(() =>
+    layerKeys.map((key) => ({
+      key,
+      number: t(`back_muscle_guide.layers.${key}.number`),
+      title: t(`back_muscle_guide.layers.${key}.title`),
+      subtitle: t(`back_muscle_guide.layers.${key}.subtitle`),
+      role: t(`back_muscle_guide.layers.${key}.role`),
+      text: t(`back_muscle_guide.layers.${key}.text`),
+      overview: t(`back_muscle_guide.layers.${key}.overview`),
+    })),
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [t]);
+
+  const integrationItems = t('back_muscle_guide.integration_items', { returnObjects: true }) as Array<{ label: string; text: string }>;
 
   /* ── Sticky nav shadow on scroll ─────────────────────── */
   useEffect(() => {
@@ -307,7 +337,6 @@ const BackMuscleGuide: React.FC = () => {
       { threshold: 0, rootMargin: `-${nav.offsetHeight}px 0px 0px 0px` }
     );
 
-    // Observe a sentinel element placed right above the nav
     const sentinel = document.getElementById('bmg-nav-sentinel');
     if (sentinel) observer.observe(sentinel);
 
@@ -331,9 +360,12 @@ const BackMuscleGuide: React.FC = () => {
           ══════════════════════════════════════════════════ */}
       <header className="bmg-header" role="banner">
         <div className="bmg-container bmg-header__content">
-          <h1 className="bmg-header__title">מדריך שרירי הגב</h1>
+          <Link to="/" className="text-white/70 hover:text-white text-sm mb-2 inline-block transition-colors">
+            ← {t('common.nav_home')}
+          </Link>
+          <h1 className="bmg-header__title">{t('back_muscle_guide.page_title')}</h1>
           <p className="bmg-header__subtitle">
-            אנטומיה &bull; טווחי תנועה &bull; מתיחות והרפיה
+            {t('back_muscle_guide.page_subtitle')}
           </p>
         </div>
       </header>
@@ -348,7 +380,7 @@ const BackMuscleGuide: React.FC = () => {
         ref={navRef}
         className={`bmg-nav ${navScrolled ? 'bmg-nav--scrolled' : ''}`}
         role="navigation"
-        aria-label="ניווט בין קבוצות שרירים"
+        aria-label={t('back_muscle_guide.nav_label')}
       >
         <div className="bmg-container">
           <div className="bmg-nav__inner">
@@ -361,7 +393,7 @@ const BackMuscleGuide: React.FC = () => {
               >
                 <span aria-hidden="true">{meta.icon}</span>
                 {meta.displayName}
-                <span className="bmg-nav__count" aria-label={`${muscles.length} שרירים`}>
+                <span className="bmg-nav__count" aria-label={t('back_muscle_guide.section_count', { count: muscles.length })}>
                   {muscles.length}
                 </span>
               </button>
@@ -374,47 +406,37 @@ const BackMuscleGuide: React.FC = () => {
           PEDAGOGICAL INTRODUCTION
           ══════════════════════════════════════════════════ */}
       <section className="bmg-intro bmg-container" aria-labelledby="intro-heading">
-        {/* ── Main intro card ───────────────────────────── */}
         <article className="bmg-intro__card">
 
-          {/* Title */}
           <h2 id="intro-heading" className="bmg-intro__heading">
-            מבוא: המכונה המופלאה של שרירי הגב
+            {t('back_muscle_guide.intro_heading')}
           </h2>
 
-          {/* Lead paragraph — always visible */}
           <p className="bmg-intro__lead">
-            הגב שלנו הוא לא סתם &quot;קיר&quot; אחורי, אלא מערכת מורכבת ורב-שכבתית של
-            שרירים, שעובדים בהרמוניה מושלמת כדי להחזיק אותנו זקופים, לאפשר לנו לנוע
-            במרחב, ולהגן על עמוד השדרה שלנו.
+            {t('back_muscle_guide.intro_lead')}
           </p>
 
-          {/* Anatomical illustration placeholder */}
           <div
             className="bmg-intro__image-placeholder"
             role="img"
-            aria-label="מקום שמור לאיור אנטומי של שכבות שרירי הגב"
+            aria-label={t('back_muscle_guide.intro_image_label')}
           >
             <span className="bmg-intro__image-placeholder__icon" aria-hidden="true">🩻</span>
-            <span>איור אנטומי — שכבות שרירי הגב</span>
-            <span className="bmg-intro__image-placeholder__sub">תמונה תוכנס בשלב הבא</span>
+            <span>{t('back_muscle_guide.intro_image_label')}</span>
+            <span className="bmg-intro__image-placeholder__sub">{t('back_muscle_guide.intro_image_hint')}</span>
           </div>
 
-          {/* Bridge paragraph */}
           <p className="bmg-intro__bridge">
-            כדי להבין למה הגב שלנו כואב, נתפס או מפתח דלקות, צריך קודם כל להבין איך הוא
-            בנוי. נהוג לחלק את שרירי הגב ל<strong>שלוש קבוצות עיקריות (שכבות)</strong>,
-            שלכל אחת תפקיד שונה לחלוטין:
+            {t('back_muscle_guide.intro_bridge')}
           </p>
 
-          {/* Expand/collapse toggle */}
           <button
             className="bmg-intro__toggle"
             onClick={() => setIntroExpanded((prev) => !prev)}
             aria-expanded={introExpanded}
             aria-controls="intro-expanded"
           >
-            {introExpanded ? 'הסתר הסבר מלא' : 'קרא את ההסבר המלא על שלוש השכבות'}
+            {introExpanded ? t('back_muscle_guide.intro_collapse') : t('back_muscle_guide.intro_expand')}
             <span
               className={`bmg-intro__toggle-icon ${introExpanded ? 'bmg-intro__toggle-icon--open' : ''}`}
               aria-hidden="true"
@@ -423,92 +445,41 @@ const BackMuscleGuide: React.FC = () => {
             </span>
           </button>
 
-          {/* ── Expandable body ────────────────────────────── */}
           {introExpanded && (
             <div id="intro-expanded" className="bmg-intro__expanded">
 
-              {/* The 3 layers */}
-              <ol className="bmg-intro__layer-list" aria-label="שלוש שכבות שרירי הגב">
-
-                <li className="bmg-intro__layer-item bmg-intro__layer-item--superficial">
-                  <h3 className="bmg-intro__layer-heading">
-                    <span className="bmg-intro__layer-num" aria-hidden="true">1</span>
-                    השכבה השטחית
-                    <span className="bmg-intro__layer-sub">(Superficial)</span>
-                    <span className="bmg-intro__layer-role">שרירי התנועה הגדולה</span>
-                  </h3>
-                  <p className="bmg-intro__layer-text">
-                    אלו השרירים הגדולים והבולטים ביותר (כמו{' '}
-                    <strong>הטרפז</strong> או <strong>הרחב-גבי</strong>). התפקיד העיקרי
-                    שלהם הוא בכלל לא להחזיק את הגב, אלא <strong>להניע את הכתפיים
-                    והזרועות שלנו</strong>. הם נכנסים לפעולה כשאנחנו מרימים משא, מושכים
-                    משהו, או שוחים. כאשר הם עובדים קשה מדי או בתנוחה לא נכונה (כמו רכינה
-                    ממושכת מול מסך), הם נוטים <strong>להתקצר ולהיתפס</strong>.
-                  </p>
-                </li>
-
-                <li className="bmg-intro__layer-item bmg-intro__layer-item--erector">
-                  <h3 className="bmg-intro__layer-heading">
-                    <span className="bmg-intro__layer-num" aria-hidden="true">2</span>
-                    השכבה האמצעית
-                    <span className="bmg-intro__layer-sub">(Intermediate)</span>
-                    <span className="bmg-intro__layer-role">שרירי הנשימה והייצוב</span>
-                  </h3>
-                  <p className="bmg-intro__layer-text">
-                    שכבה זו כוללת שרירים קטנים יותר (כמו <strong>המעוינים</strong>), שיושבים
-                    מתחת לשכבה השטחית. התפקיד שלהם הוא לייצב את השכמות ולעזור לכלוב הצלעות
-                    להתרחב ולהתכווץ בזמן נשימה עמוקה. מתח נפשי או נשימה שטחית משפיעים
-                    עליהם ישירות ויוצרים <strong>&quot;קשרים&quot; (נקודות טריגר)</strong> כואבים
-                    בין השכמות.
-                  </p>
-                </li>
-
-                <li className="bmg-intro__layer-item bmg-intro__layer-item--deep">
-                  <h3 className="bmg-intro__layer-heading">
-                    <span className="bmg-intro__layer-num" aria-hidden="true">3</span>
-                    השכבה העמוקה
-                    <span className="bmg-intro__layer-sub">(Deep)</span>
-                    <span className="bmg-intro__layer-role">שרירי היציבה והליבה</span>
-                  </h3>
-                  <p className="bmg-intro__layer-text">
-                    אלו שרירים קטנים וחזקים (כמו <strong>זוקפי הגב</strong>) שצמודים ממש
-                    לעמוד השדרה. הם עובדים <strong>24/7</strong> (כל עוד אנחנו לא שוכבים)
-                    כדי להתנגד לכוח המשיכה ולשמור עלינו זקופים. ישיבה ממושכת מחלישה אותם,
-                    מה שגורם לעומס לעבור לרצועות ולדיסקים, ומוביל ל
-                    <strong>כאבים כרוניים בגב התחתון</strong>.
-                  </p>
-                </li>
-
+              <ol className="bmg-intro__layer-list" aria-label={t('back_muscle_guide.nav_label')}>
+                {layerData.map((layer) => (
+                  <li key={layer.key} className={`bmg-intro__layer-item bmg-intro__layer-item--${layer.key === 'intermediate' ? 'erector' : layer.key}`}>
+                    <h3 className="bmg-intro__layer-heading">
+                      <span className="bmg-intro__layer-num" aria-hidden="true">{layer.number}</span>
+                      {layer.title}
+                      <span className="bmg-intro__layer-sub">({layer.subtitle})</span>
+                      <span className="bmg-intro__layer-role">{layer.role}</span>
+                    </h3>
+                    <p className="bmg-intro__layer-text">{layer.text}</p>
+                  </li>
+                ))}
               </ol>
 
-              {/* System integration section */}
               <section className="bmg-intro__integration" aria-labelledby="integration-heading">
                 <h3 id="integration-heading" className="bmg-intro__integration-heading">
-                  איך זה משתלב עם שאר הגוף?
+                  {t('back_muscle_guide.integration_heading')}
                 </h3>
                 <p className="bmg-intro__layer-text">
-                  שרירי הגב לא עובדים בוואקום. הם מחוברים למערכות אחרות בצורה הדוקה:
+                  {t('back_muscle_guide.integration_intro')}
                 </p>
                 <ul className="bmg-intro__integration-list">
-                  <li className="bmg-intro__integration-item">
-                    <strong>מערכת העצבים:</strong> חוט השדרה עובר ממש בתוך המערכת הזו.
-                    שריר גב מכווץ מדי עלול ללחוץ על עצב (כמו במקרה של סיאטיקה), מה שיקרין
-                    כאב חד לאגן או לרגליים.
-                  </li>
-                  <li className="bmg-intro__integration-item">
-                    <strong>רקמת החיבור (Fascia):</strong> הגב התחתון מכוסה ברקמת חיבור
-                    רחבה (<em>Thoracolumbar fascia</em>) שמחברת בין פלג הגוף העליון לתחתון.
-                    לכן לפעמים כאב בגב נובע בכלל משרירי ישבן או ירך אחורית קצרים מדי.
-                  </li>
+                  {Array.isArray(integrationItems) && integrationItems.map((item, i) => (
+                    <li key={i} className="bmg-intro__integration-item">
+                      <strong>{item.label}</strong> {item.text}
+                    </li>
+                  ))}
                 </ul>
               </section>
 
-              {/* Closing mission callout */}
               <p className="bmg-intro__callout">
-                המטרה של המדריך הזה היא לעזור לכם{' '}
-                <strong>לזהות בדיוק איזה שריר &quot;צועק&quot; עכשיו</strong>, להבין מה
-                המכניקה שלו, ובעיקר — ללמוד איך לשחרר אותו בצורה עצמאית דרך מתיחות מדויקות
-                והרפיה. בהמשך תוכלו לנווט לכל שריר באופן ספציפי ולראות אותו מבפנים ומבחוץ.
+                {t('back_muscle_guide.intro_callout')}
               </p>
 
             </div>
@@ -517,41 +488,17 @@ const BackMuscleGuide: React.FC = () => {
 
         {/* ── Group Overview Cards ─────────────────────── */}
         <div className="bmg-intro__groups" role="list">
-          {/* Superficial */}
-          <article className="bmg-group-overview bmg-group-overview--superficial" role="listitem">
-            <div className="bmg-group-overview__header">
-              <span className="bmg-group-overview__icon" aria-hidden="true">🦾</span>
-              <h3 className="bmg-group-overview__name">שרירים שטחיים</h3>
-            </div>
-            <p className="bmg-group-overview__desc">
-              השרירים הגדולים והבולטים (טרפז, רחב-גבי). אחראיים על הנעת הכתפיים
-              והזרועות — <strong>נוטים להתקצר ולהיתפס</strong> בישיבה ממושכת.
-            </p>
-          </article>
-
-          {/* Erector Spinae / Intermediate */}
-          <article className="bmg-group-overview bmg-group-overview--erector" role="listitem">
-            <div className="bmg-group-overview__header">
-              <span className="bmg-group-overview__icon" aria-hidden="true">⚡</span>
-              <h3 className="bmg-group-overview__name">שכבה אמצעית</h3>
-            </div>
-            <p className="bmg-group-overview__desc">
-              שרירים קטנים (מעוינים) שמייצבים שכמות ומסייעים בנשימה. מתח נפשי
-              יוצר <strong>נקודות טריגר כואבות</strong> בין השכמות.
-            </p>
-          </article>
-
-          {/* Deep */}
-          <article className="bmg-group-overview bmg-group-overview--deep" role="listitem">
-            <div className="bmg-group-overview__header">
-              <span className="bmg-group-overview__icon" aria-hidden="true">🔬</span>
-              <h3 className="bmg-group-overview__name">שרירים עמוקים</h3>
-            </div>
-            <p className="bmg-group-overview__desc">
-              זוקפי הגב — עובדים 24/7 נגד כוח המשיכה. ישיבה ממושכת מחלישה אותם
-              ומעבירה את העומס <strong>לדיסקים ולרצועות</strong>.
-            </p>
-          </article>
+          {layerData.map((layer) => (
+            <article key={layer.key} className={`bmg-group-overview bmg-group-overview--${layer.key === 'intermediate' ? 'erector' : layer.key}`} role="listitem">
+              <div className="bmg-group-overview__header">
+                <span className="bmg-group-overview__icon" aria-hidden="true">
+                  {layer.key === 'superficial' ? '🦾' : layer.key === 'intermediate' ? '⚡' : '🔬'}
+                </span>
+                <h3 className="bmg-group-overview__name">{layer.title}</h3>
+              </div>
+              <p className="bmg-group-overview__desc">{layer.overview}</p>
+            </article>
+          ))}
         </div>
       </section>
 
@@ -568,7 +515,6 @@ const BackMuscleGuide: React.FC = () => {
             className="bmg-section"
             aria-labelledby={`section-title-${meta.id}`}
           >
-            {/* ── Section Header ───────────────────────── */}
             <div className="bmg-section__header">
               <div
                 className="bmg-section__color-bar"
@@ -579,15 +525,14 @@ const BackMuscleGuide: React.FC = () => {
                   <span aria-hidden="true">{meta.icon} </span>
                   {meta.displayName}
                 </h2>
-                <span className="bmg-section__count">{muscles.length} שרירים</span>
+                <span className="bmg-section__count">{t('back_muscle_guide.section_count', { count: muscles.length })}</span>
               </div>
             </div>
 
-            {/* ── Quick-jump chips — one per muscle in this layer ── */}
             <div
               className="bmg-section__chips"
               role="list"
-              aria-label={`ניווט מהיר — ${meta.displayName}`}
+              aria-label={`${t('back_muscle_guide.quick_jump_label')} — ${meta.displayName}`}
             >
               {muscles.map((m) => (
                 <button
@@ -604,14 +549,13 @@ const BackMuscleGuide: React.FC = () => {
               ))}
             </div>
 
-            {/* ── Muscle Cards Grid ─────────────────────── */}
             <div
               className="bmg-cards-grid"
               role="list"
-              aria-label={`כרטיסי שרירים — ${meta.displayName}`}
+              aria-label={`${t('back_muscle_guide.carousel_label')} — ${meta.displayName}`}
             >
               {muscles.map((muscle) => (
-                <MuscleCard key={muscle.id} muscle={muscle} meta={meta} />
+                <MuscleCard key={muscle.id} muscle={muscle} meta={meta} carouselViews={carouselViews} />
               ))}
             </div>
           </section>
@@ -623,7 +567,7 @@ const BackMuscleGuide: React.FC = () => {
           ══════════════════════════════════════════════════ */}
       <footer className="bmg-footer bmg-container" role="contentinfo">
         <p className="bmg-footer__text">
-          מדריך שרירי הגב — לצורכי חינוך והפנמה בלבד. מומלץ לפנות לאיש מקצוע לייעוץ אישי.
+          {t('back_muscle_guide.footer_text')}
         </p>
       </footer>
     </div>
