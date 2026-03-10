@@ -5,6 +5,7 @@
  */
 import React from 'react';
 import { render, screen, fireEvent, within } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect } from 'vitest';
 
 import BackMuscleGuide from '../../pages/BackMuscleGuide';
@@ -12,6 +13,13 @@ import { musclesData } from './muscleData';
 // IntersectionObserver + scrollIntoView are mocked globally in vitest.setup.ts
 
 // ── Helper ────────────────────────────────────────────────────
+
+const renderGuide = () =>
+  render(
+    <MemoryRouter>
+      <BackMuscleGuide />
+    </MemoryRouter>
+  );
 
 /** Click a muscle card header by finding its h3 name heading (bubbles to parent div onClick) */
 const expandCard = (muscleName: string) => {
@@ -23,21 +31,21 @@ const expandCard = (muscleName: string) => {
 
 describe('BackMuscleGuide — page structure', () => {
   it('renders without crashing', () => {
-    expect(() => render(<BackMuscleGuide />)).not.toThrow();
+    expect(() => render(<MemoryRouter><BackMuscleGuide /></MemoryRouter>)).not.toThrow();
   });
 
   it('renders the main page title', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     expect(screen.getByRole('heading', { name: /מדריך שרירי הגב/, level: 1 })).toBeInTheDocument();
   });
 
   it('renders a <nav> with aria-label', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     expect(screen.getByRole('navigation', { name: /ניווט בין קבוצות שרירים/ })).toBeInTheDocument();
   });
 
   it('renders one nav button per unique layer present in musclesData', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     const nav = screen.getByRole('navigation', { name: /ניווט בין קבוצות שרירים/ });
     const uniqueLayers = [...new Set(musclesData.map((m) => m.layer))];
     const navButtons = within(nav).getAllByRole('button');
@@ -45,21 +53,21 @@ describe('BackMuscleGuide — page structure', () => {
   });
 
   it('renders an h3 for every muscle name', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     for (const muscle of musclesData) {
       expect(screen.getByRole('heading', { name: muscle.name, level: 3 })).toBeInTheDocument();
     }
   });
 
   it('renders the latin name for every muscle (collapsed state)', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     for (const muscle of musclesData) {
       expect(screen.getByText(muscle.latinName)).toBeInTheDocument();
     }
   });
 
   it('renders the ⚠ badge for isChronic muscles in collapsed state', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     const chronicMuscles = musclesData.filter((m) => m.isChronic);
     expect(chronicMuscles.length).toBeGreaterThan(0);
     // Each card header has the badge
@@ -68,7 +76,7 @@ describe('BackMuscleGuide — page structure', () => {
   });
 
   it('renders a quick-jump chip for every muscle', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     for (const muscle of musclesData) {
       // Chips use listitem role and contain the muscle name
       const chips = screen.getAllByRole('listitem');
@@ -78,7 +86,7 @@ describe('BackMuscleGuide — page structure', () => {
   });
 
   it('has a <footer> with the disclaimer text', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     expect(screen.getByRole('contentinfo')).toBeInTheDocument();
     expect(screen.getByText(/מדריך שרירי הגב — לצורכי חינוך/)).toBeInTheDocument();
   });
@@ -90,13 +98,13 @@ describe('MuscleCard — expand / collapse', () => {
   const trap = musclesData.find((m) => m.id === 'trapezius')!;
 
   it('body content is hidden before expanding', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     expect(screen.queryByText(trap.description)).not.toBeInTheDocument();
     expect(screen.queryByText(trap.location)).not.toBeInTheDocument();
   });
 
   it('clicking the card heading expands body content', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     expandCard(trap.name);
     expect(screen.getByText(trap.description)).toBeInTheDocument();
     expect(screen.getByText(trap.location)).toBeInTheDocument();
@@ -104,13 +112,13 @@ describe('MuscleCard — expand / collapse', () => {
   });
 
   it('expanded card shows the actions text', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     expandCard(trap.name);
     expect(screen.getByText(trap.actions)).toBeInTheDocument();
   });
 
   it('clicking the heading again collapses the card', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     expandCard(trap.name);
     expect(screen.getByText(trap.description)).toBeInTheDocument();
     expandCard(trap.name); // second click → collapse
@@ -118,14 +126,14 @@ describe('MuscleCard — expand / collapse', () => {
   });
 
   it('the card header div has aria-expanded=false when collapsed', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     const heading = screen.getByRole('heading', { name: trap.name, level: 3 });
     const cardHeader = heading.closest('[aria-expanded]');
     expect(cardHeader).toHaveAttribute('aria-expanded', 'false');
   });
 
   it('the card header div has aria-expanded=true when expanded', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     expandCard(trap.name);
     const heading = screen.getByRole('heading', { name: trap.name, level: 3 });
     const cardHeader = heading.closest('[aria-expanded]');
@@ -133,7 +141,7 @@ describe('MuscleCard — expand / collapse', () => {
   });
 
   it('both muscles can be expanded simultaneously', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     const erector = musclesData.find((m) => m.id === 'erector-spinae')!;
     expandCard(trap.name);
     expandCard(erector.name);
@@ -146,7 +154,7 @@ describe('MuscleCard — expand / collapse', () => {
 
 describe('MuscleCard — isChronic contracted_position section', () => {
   it('contracted_position text is shown only for chronic muscles when expanded', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     const chronicMuscle = musclesData.find((m) => m.isChronic)!;
     // hidden before expand
     expect(screen.queryByText(chronicMuscle.contracted_position)).not.toBeInTheDocument();
@@ -162,12 +170,12 @@ describe('MuscleCard — carousel', () => {
   const trap = musclesData.find((m) => m.id === 'trapezius')!;
 
   it('carousel tab list is not visible when card is collapsed', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     expect(screen.queryByRole('tablist', { name: /בחר תצוגה/ })).not.toBeInTheDocument();
   });
 
   it('shows tablist with 3 tabs after expanding', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     expandCard(trap.name);
     const tablist = screen.getByRole('tablist', { name: /בחר תצוגה/ });
     const tabs = within(tablist).getAllByRole('tab');
@@ -175,21 +183,21 @@ describe('MuscleCard — carousel', () => {
   });
 
   it('first tab (גב רגיל) is selected by default', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     expandCard(trap.name);
     const firstTab = screen.getByRole('tab', { name: /גב רגיל/ });
     expect(firstTab).toHaveAttribute('aria-selected', 'true');
   });
 
   it('second and third tabs start unselected', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     expandCard(trap.name);
     expect(screen.getByRole('tab', { name: /חתך אנטומי/ })).toHaveAttribute('aria-selected', 'false');
     expect(screen.getByRole('tab', { name: /מתיחה/ })).toHaveAttribute('aria-selected', 'false');
   });
 
   it('clicking the anatomical tab selects it and deselects the first', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     expandCard(trap.name);
     const anatomicalTab = screen.getByRole('tab', { name: /חתך אנטומי/ });
     fireEvent.click(anatomicalTab);
@@ -199,7 +207,7 @@ describe('MuscleCard — carousel', () => {
   });
 
   it('clicking the stretch tab selects it', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     expandCard(trap.name);
     const stretchTab = screen.getByRole('tab', { name: /מתיחה/ });
     fireEvent.click(stretchTab);
@@ -207,14 +215,14 @@ describe('MuscleCard — carousel', () => {
   });
 
   it('prev/next arrow buttons are rendered', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     expandCard(trap.name);
     expect(screen.getByRole('button', { name: /תצוגה קודמת/ })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /תצוגה הבאה/ })).toBeInTheDocument();
   });
 
   it('clicking next arrow advances to second tab', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     expandCard(trap.name);
     const nextBtn = screen.getByRole('button', { name: /תצוגה הבאה/ });
     fireEvent.click(nextBtn);
@@ -222,7 +230,7 @@ describe('MuscleCard — carousel', () => {
   });
 
   it('clicking prev arrow wraps around to last tab', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     expandCard(trap.name);
     const prevBtn = screen.getByRole('button', { name: /תצוגה קודמת/ });
     fireEvent.click(prevBtn);
@@ -231,7 +239,7 @@ describe('MuscleCard — carousel', () => {
   });
 
   it('placeholder is shown (images are stub paths that 404)', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     expandCard(trap.name);
     // The img will try to load a broken URL. jsdom's img doesn't fire onError automatically,
     // but we can confirm the placeholder text appears when hasError=true.
@@ -251,31 +259,31 @@ describe('MuscleCard — stretch section', () => {
   const erector = musclesData.find((m) => m.id === 'erector-spinae')!;
 
   it('stretch section heading is visible after expanding', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     expandCard(trap.name);
     expect(screen.getByRole('heading', { name: /שחרור ומתיחה/, level: 4 })).toBeInTheDocument();
   });
 
   it('primary stretch title is visible after expanding (trapezius)', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     expandCard(trap.name);
     expect(screen.getByRole('heading', { name: trap.stretch_basic.title, level: 5 })).toBeInTheDocument();
   });
 
   it('primary stretch title is visible after expanding (erector spinae)', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     expandCard(erector.name);
     expect(screen.getByRole('heading', { name: erector.stretch_basic.title, level: 5 })).toBeInTheDocument();
   });
 
   it('variant titles are NOT visible before the toggle is clicked', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     expandCard(trap.name);
     expect(screen.queryByText(trap.stretch_variants[0].title)).not.toBeInTheDocument();
   });
 
   it('clicking the variants toggle reveals all variant cards', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     expandCard(trap.name);
     const toggleBtn = screen.getByRole('button', { name: /הצג.*דרכי מתיחה נוספות/ });
     expect(toggleBtn).toHaveAttribute('aria-expanded', 'false');
@@ -286,14 +294,14 @@ describe('MuscleCard — stretch section', () => {
   });
 
   it('toggle button text changes to "הסתר" after opening', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     expandCard(trap.name);
     fireEvent.click(screen.getByRole('button', { name: /הצג.*דרכי מתיחה נוספות/ }));
     expect(screen.getByRole('button', { name: /הסתר שיטות נוספות/ })).toBeInTheDocument();
   });
 
   it('toggle button aria-expanded is true when variants are open', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     expandCard(trap.name);
     const toggleBtn = screen.getByRole('button', { name: /הצג.*דרכי מתיחה נוספות/ });
     fireEvent.click(toggleBtn);
@@ -302,7 +310,7 @@ describe('MuscleCard — stretch section', () => {
   });
 
   it('clicking toggle again hides the variant cards', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     expandCard(trap.name);
     const toggleBtn = screen.getByRole('button', { name: /הצג.*דרכי מתיחה נוספות/ });
     fireEvent.click(toggleBtn);
@@ -311,7 +319,7 @@ describe('MuscleCard — stretch section', () => {
   });
 
   it('basic stretch duration is displayed', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     expandCard(trap.name);
     expect(screen.getByText(new RegExp(trap.stretch_basic.duration, 'u'))).toBeInTheDocument();
   });
@@ -323,7 +331,7 @@ describe('MuscleCard — keyboard accessibility', () => {
   const trap = musclesData.find((m) => m.id === 'trapezius')!;
 
   it('pressing Enter on the card heading expands it', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     const heading = screen.getByRole('heading', { name: trap.name, level: 3 });
     const cardHeader = heading.closest('[role="button"]') as HTMLElement;
     expect(cardHeader).not.toBeNull();
@@ -332,7 +340,7 @@ describe('MuscleCard — keyboard accessibility', () => {
   });
 
   it('pressing Space on the card heading expands it', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     const heading = screen.getByRole('heading', { name: trap.name, level: 3 });
     const cardHeader = heading.closest('[role="button"]') as HTMLElement;
     fireEvent.keyDown(cardHeader, { key: ' ' });
@@ -340,7 +348,7 @@ describe('MuscleCard — keyboard accessibility', () => {
   });
 
   it('card header has tabIndex=0', () => {
-    render(<BackMuscleGuide />);
+    renderGuide();
     const heading = screen.getByRole('heading', { name: trap.name, level: 3 });
     const cardHeader = heading.closest('[role="button"]') as HTMLElement;
     expect(cardHeader).toHaveAttribute('tabIndex', '0');

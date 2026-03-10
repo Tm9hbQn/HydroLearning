@@ -6,8 +6,7 @@ import { DiscHerniationTool } from '../features/disc-herniation/DiscHerniationTo
 import { FractureMechanics } from '../features/fracture-mechanics/FractureMechanics';
 import { FluidJourney } from '../features/fluid-journey/FluidJourney';
 
-export const Dashboard = () => {
-  console.log("Dashboard component rendering...");
+export const Dashboard: React.FC = () => {
   const { t } = useTranslation();
 
   return (
