@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { ArrowDown, Wind, Activity, Bone, Droplets, ArrowLeft } from 'lucide-react';
+import { ArrowDown, Wind, Activity, Bone, Droplets, ArrowLeft, BookOpen } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
 const ICON_MAP: Record<string, LucideIcon> = {
@@ -10,6 +10,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
   'activity': Activity,
   'bone': Bone,
   'droplets': Droplets,
+  'book-open': BookOpen,
 };
 
 const COLOR_MAP: Record<string, { bg: string; border: string; text: string; icon: string }> = {
