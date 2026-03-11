@@ -5,6 +5,7 @@ import { Dashboard } from './pages/Dashboard';
 import HomePage from './pages/HomePage';
 
 const BackMuscleGuide = React.lazy(() => import('./pages/BackMuscleGuide'));
+const HydrotherapyCoursePage = React.lazy(() => import('./pages/HydrotherapyCoursePage'));
 
 function App() {
   return (
@@ -22,6 +23,16 @@ function App() {
           element={
             <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center text-slate-400">טוען...</div>}>
               <BackMuscleGuide />
+            </React.Suspense>
+          }
+        />
+
+        {/* Hydrotherapy Course — standalone page (own header/nav/CSS) */}
+        <Route
+          path="/course"
+          element={
+            <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center text-slate-400">טוען...</div>}>
+              <HydrotherapyCoursePage />
             </React.Suspense>
           }
         />
