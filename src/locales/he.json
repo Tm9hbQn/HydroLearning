@@ -66,6 +66,14 @@
       "icon": "spine",
       "route": "/back-anatomy",
       "color": "green"
+    },
+    {
+      "id": "hydrotherapy-course",
+      "title": "קורס הידרותרפיה",
+      "description": "הידרו-פיזיקה, פיזיולוגיה, אורתופדיה, נוירולוגיה ומתודולוגיות טיפול — הקורס המלא",
+      "icon": "book-open",
+      "route": "/hydrotherapy",
+      "color": "blue"
     }
   ],
   "back_muscle_guide": {
