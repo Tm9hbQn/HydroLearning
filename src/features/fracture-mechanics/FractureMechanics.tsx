@@ -5,6 +5,8 @@ import { Card } from '../../components/ui/Card';
 import { Slider } from '../../components/ui/Slider';
 import { cn } from '../../lib/utils';
 
+const FORCE_TYPES = ['torsion', 'compression', 'tension', 'shear'] as const;
+
 export const FractureMechanics = () => {
   const { t } = useTranslation();
   const [forceVal, setForceVal] = useState(0);
@@ -45,7 +47,7 @@ export const FractureMechanics = () => {
       <div className="flex flex-col gap-4">
         {/* Force Selection */}
         <div className="flex gap-1 justify-center bg-slate-100 p-1 rounded-lg">
-           {(['torsion', 'compression', 'tension', 'shear'] as const).map(ft => (
+           {FORCE_TYPES.map(ft => (
                <button
                 key={ft}
                 onClick={() => { setForceType(ft); setForceVal(0); }}
